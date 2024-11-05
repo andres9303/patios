@@ -33,7 +33,7 @@
                     @if ($m->route)
                     <!-- Submenú -->
                     <div x-show="open" class="pl-8">
-                        <x-nav-link href="#" :active="request()->routeIs($m->active)" icon="{{ $m->icon }}">
+                        <x-nav-link href="{{ route($m->route .'.index') }}" :active="request()->routeIs($m->active)" icon="{{ $m->icon }}">
                             {{ $m->name }}
                         </x-nav-link>
                     </div>

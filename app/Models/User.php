@@ -90,4 +90,9 @@ class User extends Authenticatable
             get: fn ($value) => collect(json_decode($value)),
         );
     }
+
+    public function currentCompany()
+    {
+        return $this->belongsTo(Company::class, 'current_company_id');
+    }
 }

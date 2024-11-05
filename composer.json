@@ -11,12 +11,12 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^3.0",
-        "power-components/livewire-powergrid": "*"
+        "openspout/openspout": "^4.26",
+        "power-components/livewire-powergrid": "^6.0",
+        "spatie/laravel-html": "^3.11"
     },
     "require-dev": {
-        "caouecs/laravel-lang": "*",
         "fakerphp/faker": "^1.23",
-        "laravel-lang/lang": "*",
         "laravel/pail": "^1.1",
         "laravel/pint": "^1.13",
         "laravel/sail": "^1.26",

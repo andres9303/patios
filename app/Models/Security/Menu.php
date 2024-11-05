@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Menu extends Model
 {
     protected $fillable = [
-        'coddoc',
-        'text',
+        'code',
+        'name',
         'route',
         'active',
         'icon',
