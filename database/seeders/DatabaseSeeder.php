@@ -22,6 +22,8 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             CatalogSeeder::class,
             VariableSeeder::class,
+            LocationSeeder::class,
+            CategorySeeder::class,
         ]);
     }
 }

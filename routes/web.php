@@ -3,10 +3,16 @@
 use App\Http\Controllers\config\ListController;
 use App\Http\Controllers\config\VariableController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Master\CategoryController;
 use App\Http\Controllers\master\CompanyController;
+use App\Http\Controllers\Master\LocationController;
+use App\Http\Controllers\master\PersonController;
 use App\Http\Controllers\security\MenuController;
 use App\Http\Controllers\security\RoleController;
 use App\Http\Controllers\security\UserController;
+use App\Http\Controllers\Ticket\ManageTicketController;
+use App\Http\Controllers\Ticket\ResolveTicketController;
+use App\Http\Controllers\Ticket\TicketController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {    return redirect()->route('login');})->middleware('guest');
@@ -35,6 +41,15 @@ Route::delete('/shortcuts/{role}/{menu}', [RoleController::class, 'destroyShortc
 
 //Master
 Route::resource('companies', CompanyController::class)->middleware(['auth', 'can:view-menu,"company"'])->except(['show'])->names('company');
+Route::resource('people', PersonController::class)->middleware(['auth', 'can:view-menu,"person"'])->except(['show'])->names('person');
+Route::resource('locations', LocationController::class)->middleware(['auth', 'can:view-menu,"location"'])->except(['show'])->names('location');
+Route::resource('categories', CategoryController::class)->middleware(['auth', 'can:view-menu,"category"'])->except(['show'])->names('category');
+
+//Ticket
+Route::resource('tickets', TicketController::class)->middleware(['auth', 'can:view-menu,"ticket"'])->names('ticket');
+Route::resource('manage-tickets', ManageTicketController::class)->middleware(['auth', 'can:view-menu,"manage-ticket"'])->except(['show'])->names('manage-ticket');
+Route::get('/resolve-tickets', [ResolveTicketController::class, 'index'])->middleware(['auth', 'can:view-menu,"resolve-ticket"'])->name('resolve-ticket.index');
+Route::resource('/{ticket}/resolve-tickets', ResolveTicketController::class)->middleware(['auth', 'can:view-menu,"resolve-ticket"'])->except(['index', 'show'])->names('resolve-ticket');
 
 //Config
 Route::resource('lists', ListController::class)->middleware(['auth', 'can:view-menu,"list"'])->except(['show'])->names('list');
