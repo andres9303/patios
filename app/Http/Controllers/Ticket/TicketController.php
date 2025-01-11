@@ -23,16 +23,7 @@ class TicketController extends Controller
 
     public function create()
     {
-        $persons = Person::where('state', 1)->where('isClient', 1)->get();
-        $locations = Location::where('state', 1)->where(function ($query) {
-            $query->where('company_id', Auth::user()->current_company_id)
-                  ->orWhere('company_id', 1);
-        })->orderBy('name')->get();
-        $categories = Category::where('state', 1)->where(function ($query) {
-            $query->where('company_id', Auth::user()->current_company_id)
-                  ->orWhere('company_id', 1);
-        })->orderBy('name')->get();
-        return view('ticket.ticket.create', compact('persons', 'locations', 'categories'));
+        return view('ticket.ticket.create');
     }
 
     public function store(TicketRequest $request)
@@ -41,11 +32,12 @@ class TicketController extends Controller
         try {
             Ticket::create([
                 'date' => $request->date,
+                'name' => $request->name,
                 'company_id' => Auth::user()->current_company_id,
-                'person_id' => $request->person_id,
                 'location_id' => $request->location_id,
                 'category_id' => $request->category_id,
                 'category2_id' => $request->category2_id,
+                'item_id' => $request->item_id,
                 'text' => $request->text,
                 'state' => 0,
                 'user_id' => Auth::user()->id,
@@ -66,16 +58,7 @@ class TicketController extends Controller
 
     public function edit(Ticket $ticket)
     {
-        $persons = Person::where('state', 1)->where('isClient', 1)->get();
-        $locations = Location::where('state', 1)->where(function ($query) {
-            $query->where('company_id', Auth::user()->current_company_id)
-                  ->orWhere('company_id', 1);
-        })->get();
-        $categories = Category::where('state', 1)->where(function ($query) {
-            $query->where('company_id', Auth::user()->current_company_id)
-                  ->orWhere('company_id', 1);
-        })->get();
-        return view('ticket.ticket.edit', compact('ticket', 'persons', 'locations', 'categories'));
+        return view('ticket.ticket.edit', compact('ticket'));
     }
 
     public function update(TicketRequest $request, Ticket $ticket)
@@ -84,11 +67,13 @@ class TicketController extends Controller
         try {
             $ticket->update([
                 'date' => $request->date,
+                'name' => $request->name,
                 'company_id' => Auth::user()->current_company_id,
                 'person_id' => $request->person_id,
                 'location_id' => $request->location_id,
                 'category_id' => $request->category_id,
                 'category2_id' => $request->category2_id,
+                'item_id' => $request->item_id,
                 'text' => $request->text,
                 'state' => 0,
                 'user_id' => Auth::user()->id,
@@ -124,5 +109,10 @@ class TicketController extends Controller
             DB::rollBack();
             return back()->with('error', 'Ha ocurrido un error, por favor reportar con el siguiente mensaje: '.$e->getMessage());
         }
+    }
+
+    public function attachment(Ticket $ticket)
+    {
+        return view('ticket.ticket.attachment', compact('ticket'));
     }
 }

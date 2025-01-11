@@ -2,6 +2,7 @@
 
 namespace App\Models\Ticket;
 
+use App\Models\Attachment;
 use App\Models\Master\Category;
 use App\Models\Master\Company;
 use App\Models\Master\Location;
@@ -15,11 +16,13 @@ class Ticket extends Model
         'date',
         'date2',
         'date3',
+        'name',
         'company_id',
         'person_id',
         'location_id',
         'category_id',
         'category2_id',
+        'item_id',
         'text',
         'state',
         'user_id',
@@ -64,5 +67,10 @@ class Ticket extends Model
     public function trackings()
     {
         return $this->hasMany(Tracking::class, 'ticket_id');
+    }
+
+    public function attachments()
+    {
+        return $this->morphMany(Attachment::class, 'attachmentable');
     }
 }

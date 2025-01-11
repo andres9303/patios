@@ -29,6 +29,8 @@ class MenuSeeder extends Seeder
             ['id' => 301,'code' => 'RTK','name' => 'Registro Novedad','route' => 'ticket', 'active' => 'ticket*','icon' => 'fas fa-pencil-ruler','order' => 0,'menu_id' => 300],
             ['id' => 302,'code' => 'ATK','name' => 'Asignar Novedad','route' => 'manage-ticket', 'active' => 'manage-ticket*','icon' => 'fas fa-puzzle-piece','order' => 1,'menu_id' => 300],
             ['id' => 303,'code' => 'STK','name' => 'Resolver Novedad','route' => 'resolve-ticket', 'active' => 'resolve-ticket*','icon' => 'fas fa-file-signature','order' => 2,'menu_id' => 300],
+            ['id' => 304,'code' => 'STI','name' => 'Tickets Informativo','route' => 'resolve-2ticket', 'active' => 'resolve-2ticket*','icon' => 'fas fa-info','order' => 3,'menu_id' => 300],
+            ['id' => 305,'code' => 'STOP','name' => 'Tickets Objetos perdidos','route' => 'resolve-3ticket', 'active' => 'resolve-3ticket*','icon' => 'fas fa-search','order' => 4,'menu_id' => 300],
             ['id' => 900, 'code' => NULL, 'name' => 'Reportes', 'route' => NULL, 'active' => null, 'icon' => 'fas fa-chart-pie', 'order' => 99, 'menu_id' => NULL],
             ['id' => 9000,'code' => NULL,'name' => 'Configuración','route' => NULL, 'active' => null,'icon' => 'fas fa-cog','order' => 9999,'menu_id' => NULL,],
             ['id' => 9003,'code' => 'LST','name' => 'Listas','route' => 'list', 'active' => 'list*','icon' => 'fas fa-list-ol','order' => 3,'menu_id' => 9000,],

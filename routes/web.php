@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AttachmentController;
 use App\Http\Controllers\config\ListController;
 use App\Http\Controllers\config\VariableController;
 use App\Http\Controllers\HomeController;
@@ -11,12 +12,18 @@ use App\Http\Controllers\security\MenuController;
 use App\Http\Controllers\security\RoleController;
 use App\Http\Controllers\security\UserController;
 use App\Http\Controllers\Ticket\ManageTicketController;
+use App\Http\Controllers\Ticket\Resolve2TicketController;
+use App\Http\Controllers\Ticket\Resolve3TicketController;
 use App\Http\Controllers\Ticket\ResolveTicketController;
 use App\Http\Controllers\Ticket\TicketController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {    return redirect()->route('login');})->middleware('guest');
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',])->group(function () { Route::get('/home', [HomeController::class, 'index'])->name('home');});
+
+//Attachment
+Route::post('/attachments', [AttachmentController::class, 'store'])->name('attachments.store');
+Route::delete('/attachments/{attachment}', [AttachmentController::class, 'destroy'])->name('attachments.destroy');
 
 //Security
 Route::resource('users', UserController::class)->middleware(['auth', 'can:view-menu,"user"'])->except(['show'])->names('user');
@@ -46,10 +53,19 @@ Route::resource('locations', LocationController::class)->middleware(['auth', 'ca
 Route::resource('categories', CategoryController::class)->middleware(['auth', 'can:view-menu,"category"'])->except(['show'])->names('category');
 
 //Ticket
-Route::resource('tickets', TicketController::class)->middleware(['auth', 'can:view-menu,"ticket"'])->names('ticket');
+Route::resource('tickets', TicketController::class)->middleware(['auth', 'can:view-menu,"ticket"'])->except(['show'])->names('ticket');
+Route::get('/tickets/show/{ticket}', [TicketController::class, 'show'])->name('ticket.show');
+Route::get('/tickets/{ticket}/attachments', [TicketController::class, 'attachment'])->middleware(['auth', 'can:view-menu,"ticket"'])->name('ticket.attachment.index');
 Route::resource('manage-tickets', ManageTicketController::class)->middleware(['auth', 'can:view-menu,"manage-ticket"'])->except(['show'])->names('manage-ticket');
 Route::get('/resolve-tickets', [ResolveTicketController::class, 'index'])->middleware(['auth', 'can:view-menu,"resolve-ticket"'])->name('resolve-ticket.index');
 Route::resource('/{ticket}/resolve-tickets', ResolveTicketController::class)->middleware(['auth', 'can:view-menu,"resolve-ticket"'])->except(['index', 'show'])->names('resolve-ticket');
+Route::get('/{ticket}/resolve-tickets/{resolve_ticket}/attachments', [ResolveTicketController::class, 'attachment'])->middleware(['auth', 'can:view-menu,"resolve-ticket"'])->name('resolve-ticket.attachment.index');
+Route::get('/resolve-2tickets', [Resolve2TicketController::class, 'index'])->middleware(['auth', 'can:view-menu,"resolve-2ticket"'])->name('resolve-2ticket.index');
+Route::resource('/{ticket}/resolve-2tickets', Resolve2TicketController::class)->middleware(['auth', 'can:view-menu,"resolve-2ticket"'])->except(['index', 'show'])->names('resolve-2ticket');
+Route::get('/{ticket}/resolve-2tickets/{resolve_2ticket}/attachments', [Resolve2TicketController::class, 'attachment'])->middleware(['auth', 'can:view-menu,"resolve-2ticket"'])->name('resolve-2ticket.attachment.index');
+Route::get('/resolve-3tickets', [Resolve3TicketController::class, 'index'])->middleware(['auth', 'can:view-menu,"resolve-3ticket"'])->name('resolve-3ticket.index');
+Route::resource('/{ticket}/resolve-3tickets', Resolve3TicketController::class)->middleware(['auth', 'can:view-menu,"resolve-3ticket"'])->except(['index', 'show'])->names('resolve-3ticket');
+Route::get('/{ticket}/resolve-3tickets/{resolve_3ticket}/attachments', [Resolve3TicketController::class, 'attachment'])->middleware(['auth', 'can:view-menu,"resolve-3ticket"'])->name('resolve-3ticket.attachment.index');
 
 //Config
 Route::resource('lists', ListController::class)->middleware(['auth', 'can:view-menu,"list"'])->except(['show'])->names('list');

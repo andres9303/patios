@@ -88,4 +88,9 @@ class ResolveTicketController extends Controller
         
         return redirect()->route('resolve-ticket.index')->with('success', 'El seguimiento ha sido eliminado correctamente.');
     }
+
+    public function attachment(Ticket $ticket, Tracking $resolve_ticket)
+    {
+        return view('ticket.tracking.attachment', compact('ticket', 'resolve_ticket'));
+    }
 }

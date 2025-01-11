@@ -38,35 +38,41 @@ class JetstreamServiceProvider extends ServiceProvider
 
         Fortify::authenticateUsing(function (Request $request) {
             $company = Company::where('id', $request->company_id)->where('state', 1)->first();
+            $company_all = Company::where('name', 'Todos')->first();
+        
             $user = User::where('username', $request->username)->first();
-
-            if ($user &&
-                $user->belongsToCompany($company) &&
-                Hash::check($request->password, $user->password)) {
-
-                $company_all = Company::where('name', 'Todos')->first();
-                if ($user->belongsToCompany($company_all))
-                    $roles = $user->roles()->get();
-                else
-                    $roles = $user->roles()->wherePivot('company_id', $user->current_company_id)->get();
-
-                $ids = collect();
-                foreach ($roles as $role) {
-                    $ids = $ids->merge($role->menus->pluck('id'));
-                    $ids = $ids->merge($role->menus->pluck('menu_id'));
-                }
-
-                $menus = Menu::whereIn('id', $ids)
-                        ->groupBy('id', 'icon', 'name', 'order', 'route', 'active')
+        
+            if ($user && Hash::check($request->password, $user->password)) {
+                if ($user->belongsToCompany($company) || $user->belongsToCompany($company_all)) {
+        
+                    $companyIds = [$company->id];
+                    if ($company_all) {
+                        $companyIds[] = $company_all->id;
+                    }
+        
+                    $roles = $user->roles()
+                        ->wherePivotIn('company_id', $companyIds)
+                        ->get();
+        
+                    $menuIds = collect();
+                    foreach ($roles as $role) {
+                        $menuIds = $menuIds->merge($role->menus->pluck('id'));
+                        $menuIds = $menuIds->merge($role->menus->pluck('menu_id'));
+                    }
+                    $menuIds = $menuIds->unique()->filter();
+        
+                    $menus = Menu::whereIn('id', $menuIds)
                         ->select('id', 'icon', 'name', 'order', 'route', 'active')
+                        ->groupBy('id', 'icon', 'name', 'order', 'route', 'active')
                         ->orderBy('id')
                         ->get();
-
-                $user->current_company_id = $company->id;
-                $user->menu = $menus->toJson();
-                $user->save();
-
-                return $user;
+        
+                    $user->current_company_id = $company->id;
+                    $user->menu = $menus->toJson();
+                    $user->save();
+        
+                    return $user;
+                }
             }
         });
 

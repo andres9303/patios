@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        Tickets - Crear Seguimiento - Ticket #{{ $ticket->id }}
+        Tickets - Crear Seguimiento Novedad - Ticket #{{ $ticket->id }}
     </x-slot>
 
     <x-crud-index>

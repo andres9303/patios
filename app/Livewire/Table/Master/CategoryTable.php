@@ -3,6 +3,7 @@
 namespace App\Livewire\Table\Master;
 
 use App\Models\Master\Category;
+use App\Models\Master\Company;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\View\View;
@@ -38,13 +39,16 @@ final class CategoryTable extends PowerGridComponent
 
     public function datasource(): Builder
     {
+        $company_all = Company::where('name', 'Todos')->first();
+
         return Category::query()
             ->leftJoin('categories as parent', 'parent.id', '=', 'categories.ref_id')
-            ->where('categories.company_id', auth()->user()->current_company_id)
+            ->whereIn('categories.company_id', [auth()->user()->current_company_id, $company_all->id])
             ->select([
                 'categories.*',
                 'parent.name as parent_name',
-            ]);
+            ])
+            ->orderBy('parent.name');
     }
 
     public function relationSearch(): array

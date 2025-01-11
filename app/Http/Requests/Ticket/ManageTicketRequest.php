@@ -16,10 +16,10 @@ class ManageTicketRequest extends FormRequest
     {
         return [
             'date' => 'required|date',
-            'person_id' => 'required|exists:people,id',
+            'name' => 'required|string',
             'location_id' => 'required|exists:locations,id',
-            'category_id' => 'required|exists:categories,id',
-            'category2_id' => 'nullable|exists:categories,id',
+            'category2_id' => 'required|exists:categories,id',
+            'item_id' => 'required|exists:items,id',
             'text' => 'required|string',
             'user2_id' => 'required|exists:users,id',
         ];

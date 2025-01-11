@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        Tickets - Editar Seguimiento - {{ $resolve_ticket->date }}
+        Tickets - Editar Seguimiento Novedad - {{ $resolve_ticket->date }}
     </x-slot>
 
     <x-crud-index>

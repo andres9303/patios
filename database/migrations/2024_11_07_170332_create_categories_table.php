@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('name', 200);
             $table->text('text')->nullable();
             $table->integer('days')->nullable();
-            $table->foreignId('ref_id')->nullable()->constrained('locations');
+            $table->foreignId('ref_id')->nullable()->constrained('categories');
             $table->foreignId('company_id')->nullable()->constrained('companies');
             $table->boolean('state')->default(1);
             $table->timestamps();

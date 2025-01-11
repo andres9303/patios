@@ -17,7 +17,7 @@
         <div class="flex flex-col h-full">
             <!-- Imagen del usuario -->
             <div class="flex items-center justify-center h-24 bg-indigo-900">
-                <img class="h-20 w-20 rounded-full object-cover" src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}" />
+                <img class="h-20 w-20 rounded-full object-cover" src="{{ asset('img/logo.png') }}" alt="{{ Auth::user()->name }}" />
             </div>
 
             <!-- Menú de navegación -->

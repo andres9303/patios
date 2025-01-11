@@ -69,13 +69,13 @@ class User extends Authenticatable
 
     public function belongsToCompany($company): bool
     {
-        return $this->companies()->where('company_id', $company)->exists() ||
+        return $this->companies()->where('company_id', $company->id)->exists() ||
                $this->companies()->where('name', 'Todos')->exists();
     }
 
     public function companies()
     {
-        return $this->belongsToMany(Company::class)->withPivot('role_id');
+        return $this->belongsToMany(Company::class, 'company_user')->withPivot('role_id');
     }
 
     public function roles()
@@ -94,5 +94,12 @@ class User extends Authenticatable
     public function currentCompany()
     {
         return $this->belongsTo(Company::class, 'current_company_id');
+    }
+
+    public function rolesInCompanies($companyIds)
+    {
+        return $this->belongsToMany(Role::class, 'company_user', 'user_id', 'role_id')
+            ->withPivot('company_id')
+            ->wherePivotIn('company_id', $companyIds);
     }
 }

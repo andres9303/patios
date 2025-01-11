@@ -48,6 +48,21 @@ class CatalogSeeder extends Seeder
 
         DB::table('items')->insert($items);
 
+        $catalog = Catalog::create([
+            'id' => 3,
+            'name' => 'Prioridad',
+            'text' => 'Prioridades ticktes'
+        ]);
+
+        $items = [
+            ['id' => 301, 'catalog_id' => $catalog->id,'name' => 'Baja', 'text' => 'Low', 'order' => 0],
+            ['id' => 302, 'catalog_id' => $catalog->id,'name' => 'Media', 'text' => 'Medium', 'order' => 1],
+            ['id' => 303, 'catalog_id' => $catalog->id,'name' => 'Alta', 'text' => 'High', 'order' => 2],
+            ['id' => 304, 'catalog_id' => $catalog->id,'name' => 'Urgente', 'text' => 'Urgent', 'order' => 3],
+        ];
+
+        DB::table('items')->insert($items);
+
         Catalog::create([
             'id' => 203,
             'name' => 'categoria producto',

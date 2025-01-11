@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        Tickets - Tickets - Editar Ticket - {{ $ticket->date }}
+        Tickets - Tickets - Editar Ticket - {{ $ticket->id }} - {{ $ticket->date }}
     </x-slot>
 
     <x-crud-index>
@@ -14,7 +14,7 @@
             <div class="flex justify-center mt-8">
                 <div class="w-full md:w-1/2">
                     {!! html()->form('PUT', route('ticket.update', ['ticket' => $ticket]))->open() !!}
-                        @include('ticket.ticket.components.form-elements')
+                        <livewire:component.ticket-form :ticket="$ticket" />
                         @if ($errors->any())
                             <div class="flex items-center bg-red-100 text-red-500 text-sm font-bold px-4 py-3" role="alert">
                                 <ul>

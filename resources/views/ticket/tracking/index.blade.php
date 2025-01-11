@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        Tickets - Seguimiento
+        Tickets - Seguimiento Novedades
     </x-slot>
 
     <x-crud-index>

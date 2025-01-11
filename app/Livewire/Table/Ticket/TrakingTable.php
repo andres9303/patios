@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Table\Ticket;
 
+use App\Models\Config\Variable;
 use App\Models\Ticket\Ticket;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -38,8 +39,11 @@ final class TrakingTable extends PowerGridComponent
 
     public function datasource(): Builder
     {
+        $tracking2 = Variable::where('cod', 'TKT_TYPE2')->first()->concept;
+        $tracking3 = Variable::where('cod', 'TKT_TYPE3')->first()->concept;
+        
         return Ticket::query()
-            ->leftJoin('people', 'people.id', '=', 'tickets.person_id')
+            ->leftJoin('items', 'items.id', '=', 'tickets.item_id')
             ->leftJoin('locations', 'locations.id', '=', 'tickets.location_id')
             ->leftJoin('categories as category', 'category.id', '=', 'tickets.category_id')
             ->leftJoin('categories as sub_category', 'sub_category.id', '=', 'tickets.category2_id')
@@ -47,17 +51,25 @@ final class TrakingTable extends PowerGridComponent
             ->leftJoin('users as assigned', 'assigned.id', '=', 'tickets.user2_id')
             ->where('tickets.company_id', auth()->user()->current_company_id)
             ->where('tickets.user2_id', auth()->user()->id)
+            ->whereNotIn('tickets.category2_id', [$tracking2, $tracking3])
             ->select([
                 'tickets.*',
-                'people.name as person_name',
+                'items.name as priority',
                 'locations.name as location_name',
                 'category.name as category_name',
                 'sub_category.name as sub_category_name',
                 'reporter.name as reporter_name',
                 'assigned.name as assigned_name',
             ])
-            ->take(200)
-            ->orderBy('tickets.state')
+            ->take(200)           
+            ->orderByRaw("
+            CASE 
+                WHEN tickets.state = 0 THEN 1
+                WHEN tickets.state = 2 THEN 2
+                WHEN tickets.state = 1 THEN 3
+            END
+            ")
+            ->orderBy('items.order', 'desc')
             ->orderBy('tickets.date', 'desc');
     }
 
@@ -73,13 +85,14 @@ final class TrakingTable extends PowerGridComponent
             ->add('date')
             ->add('date2')
             ->add('date3')
-            ->add('person_name')
+            ->add('name')
             ->add('location_name')
             ->add('category_name')
             ->add('sub_category_name')
+            ->add('priority')
             ->add('text', fn($row) => substr($row->text, 0, 35).'...')
             ->add('state')
-            ->add('state_det', fn($row) => $row->state == '0' ? 'Pendiente' : ($row->state == '1' ? 'Cerrado' : 'Asignado'))
+            ->add('state_det', fn($row) => $row->state == '0' ? '<div class="bg-red-500 text-white w-full h-full text-center">Pendiente</div>' : ($row->state == '1' ? '<div class="bg-green-500 text-white w-full h-full text-center">Cerrado</div>' : '<div class="bg-blue-500 text-white w-full h-full text-center">Asignado</div>'))
             ->add('reporter_name')
             ->add('assigned_name');
     }
@@ -91,11 +104,20 @@ final class TrakingTable extends PowerGridComponent
                 ->searchable()
                 ->sortable(),
 
-            Column::make('Fecha', 'date', 'tickets.date')
+            Column::make('Estado', 'state_det', 'tickets.state')
+                ->sortable()
+                ->searchable()
+                ->visibleInExport(false),
+
+            Column::make('Estado', 'state', 'tickets.state')
+                ->visibleInExport(true)
+                ->hidden(),
+
+            Column::make('Prioridad', 'priority', 'items.name')
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Fecha Esperada', 'date2', 'tickets.date2')
+            Column::make('Fecha', 'date', 'tickets.date')
                 ->sortable()
                 ->searchable(),
 
@@ -103,19 +125,7 @@ final class TrakingTable extends PowerGridComponent
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Huesped/Tercero', 'person_name', 'people.name')
-                ->sortable()
-                ->searchable(),
-
             Column::make('Locación/Habitación', 'location_name', 'locations.name')
-                ->sortable()
-                ->searchable(),
-
-            Column::make('Categoría', 'category_name', 'category.name')
-                ->sortable()
-                ->searchable(),
-
-            Column::make('Sub-Categoría', 'sub_category_name', 'sub_category.name')
                 ->sortable()
                 ->searchable(),
 
@@ -123,9 +133,17 @@ final class TrakingTable extends PowerGridComponent
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Estado', 'state_det')
+            Column::make('Huesped/Tercero', 'name', 'tickets.name')
+                ->sortable()
+                ->searchable(),            
+
+            Column::make('Categoría', 'category_name', 'category.name')
                 ->sortable()
                 ->searchable(),
+
+            Column::make('Sub-Categoría', 'sub_category_name', 'sub_category.name')
+                ->sortable()
+                ->searchable(),            
 
             Column::make('Reportó', 'reporter_name', 'reporter.name')
                 ->sortable()
@@ -145,10 +163,11 @@ final class TrakingTable extends PowerGridComponent
             Filter::inputText('date')->operators(['contains']),
             Filter::inputText('date2')->operators(['contains']),
             Filter::inputText('date3')->operators(['contains']),
-            Filter::inputText('person_name')->operators(['contains']),
+            Filter::inputText('name')->operators(['contains']),
             Filter::inputText('location_name')->operators(['contains']),
             Filter::inputText('category_name')->operators(['contains']),
             Filter::inputText('sub_category_name')->operators(['contains']),
+            Filter::inputText('priority')->operators(['contains']),
             Filter::inputText('text')->operators(['contains']),
             Filter::inputText('state_det')->operators(['contains']),
             Filter::inputText('reporter_name')->operators(['contains']),

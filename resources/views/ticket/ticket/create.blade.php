@@ -14,7 +14,7 @@
             <div class="flex justify-center mt-8">
                 <div class="w-full md:w-1/2">
                     {!! html()->form('POST', route('ticket.store'))->open() !!}
-                        @include('ticket.ticket.components.form-elements')
+                        <livewire:component.ticket-form />
                         @if ($errors->any())
                             <div class="flex items-center bg-red-100 text-red-500 text-sm font-bold px-4 py-3" role="alert">
                                 <ul>

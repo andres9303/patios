@@ -14,7 +14,7 @@
             <div class="flex justify-center mt-8">
                 <div class="w-full md:w-1/2">
                     {!! html()->form('PUT', route('manage-ticket.update', ['manage_ticket' => $manage_ticket]))->open() !!}
-                        @include('ticket.manage.components.form-elements')
+                    <livewire:component.ticket-form :ticket="$manage_ticket" :isManage="true" />
                         @if ($errors->any())
                             <div class="flex items-center bg-red-100 text-red-500 text-sm font-bold px-4 py-3" role="alert">
                                 <ul>

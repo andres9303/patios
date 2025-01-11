@@ -13,8 +13,8 @@
         <x-slot name="content">
             <div class="flex justify-center mt-8">
                 <div class="w-full md:w-1/2">
-                    {!! html()->form('POST', route('manage-.store'))->open() !!}
-                        @include('ticket.manage.components.form-elements')
+                    {!! html()->form('POST', route('manage-ticket.store'))->open() !!}
+                        <livewire:component.ticket-form :isManage="true" />
                         @if ($errors->any())
                             <div class="flex items-center bg-red-100 text-red-500 text-sm font-bold px-4 py-3" role="alert">
                                 <ul>

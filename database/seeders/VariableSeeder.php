@@ -14,7 +14,9 @@ class VariableSeeder extends Seeder
     public function run(): void
     {
         $variables = [
-            ['cod' => 'TKT_DAYS', 'name' => 'Días por defecto de solucion tickets', 'concept' => 2],
+            ['cod' => 'TKT_DAYS', 'name' => 'Días por defecto de solucion tickets', 'concept' => 5],
+            ['cod' => 'TKT_TYPE2', 'name' => 'ID de la categoría que se clasificará en el tipo 2', 'concept' => 0],
+            ['cod' => 'TKT_TYPE3', 'name' => 'ID de la categoría que se clasificará en el tipo 3', 'concept' => 0],
         ];
 
         DB::table('variables')->insert($variables);

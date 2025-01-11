@@ -14,74 +14,60 @@ class MenuPolicy
     public function view(User $user, $menu): bool
     {
         $menu = Menu::where('route', $menu)->first();
-        if($menu)
-        {
-            $roles = $user->roles()->get();
-            $roles = $roles->filter(function ($role) use ($user) {                
-                $company_all = Company::where('name', 'Todos')->first();
 
-                return $role->pivot->company_id == $user->current_company_id || $role->pivot->company_id == $company_all->id;
-            });
-            
-            foreach ($roles as $role) {
-                if ($role->menus->contains('id', $menu->id)) {
-                    return true;
-                }
-            }
+        if ($menu) {
+            $companyAllId = Company::where('name', 'Todos')->value('id');
+            $companyIds = [$user->current_company_id, $companyAllId];
+
+            $hasAccess = $user->rolesInCompanies($companyIds)
+                ->whereHas('menus', function ($query) use ($menu) {
+                    $query->where('menus.id', $menu->id);
+                })
+                ->exists();
+
+            return $hasAccess;
         }
 
         return false;
     }
 
-    public function approve1(User $user, $name): bool
+    public function approve1(User $user, $menuRoute): bool
     {
-        $menu = Menu::where('route', $name)->first();
-        if($menu)
-        {
-            $roles = $user->roles()->get();
-            $roles = $roles->filter(function ($role) use ($user) {
-                $company_all = Company::where('name', 'Todos')->first();
+        $menu = Menu::where('route', $menuRoute)->first();
 
-                return $role->pivot->company_id == $user->current_company_id || $role->pivot->company_id == $company_all->id;
-            });
-            foreach ($roles as $role) {
-                $exists = DB::table('permission_role')
-                    ->where('role_id', $role->id)
-                    ->where('menu_id', $menu->id)
-                    ->where('permission_id', 7) // 7: Aprobar 1
-                    ->exists();
+        if ($menu) {
+            $companyAllId = Company::where('name', 'Todos')->value('id');
+            $companyIds = [$user->current_company_id, $companyAllId];
 
-                if ($exists) {
-                    return true;
-                }
-            }
+            $hasPermission = $user->rolesInCompanies($companyIds)
+                ->whereHas('permissions', function ($query) use ($menu) {
+                    $query->where('permission_role.menu_id', $menu->id)
+                        ->where('permission_role.permission_id', 7); // 7: Aprobar 1
+                })
+                ->exists();
+
+            return $hasPermission;
         }
 
         return false;
     }
 
-    public function approve2(User $user, $name): bool
+    public function approve2(User $user, $menuRoute): bool
     {
-        $menu = Menu::where('route', $name)->first();
-        if($menu)
-        {
-            $roles = $user->roles()->get();
-            $roles = $roles->filter(function ($role) use ($user) {
-                $company_all = Company::where('name', 'Todos')->first();
+        $menu = Menu::where('route', $menuRoute)->first();
 
-                return $role->pivot->company_id == $user->current_company_id || $role->pivot->company_id == $company_all->id;
-            });
-            foreach ($roles as $role) {
-                $exists = DB::table('permission_role')
-                    ->where('role_id', $role->id)
-                    ->where('menu_id', $menu->id)
-                    ->where('permission_id', 8) // 8: Aprobar 2
-                    ->exists();
+        if ($menu) {
+            $companyAllId = Company::where('name', 'Todos')->value('id');
+            $companyIds = [$user->current_company_id, $companyAllId];
 
-                if ($exists) {
-                    return true;
-                }
-            }
+            $hasPermission = $user->rolesInCompanies($companyIds)
+                ->whereHas('permissions', function ($query) use ($menu) {
+                    $query->where('permission_role.menu_id', $menu->id)
+                        ->where('permission_role.permission_id', 8); // 8: Aprobar 2
+                })
+                ->exists();
+
+            return $hasPermission;
         }
 
         return false;

@@ -2,6 +2,7 @@
 
 namespace App\Models\Ticket;
 
+use App\Models\Attachment;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
@@ -24,5 +25,10 @@ class Tracking extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function attachments()
+    {
+        return $this->morphMany(Attachment::class, 'attachmentable');
     }
 }

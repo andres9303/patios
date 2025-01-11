@@ -18,7 +18,7 @@ class CompanySeeder extends Seeder
         ]);
 
         Company::forceCreate([
-            'name' => "0 - Principal",
+            'name' => "0 - Manila",
         ]);
     }
 }

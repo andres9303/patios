@@ -6,11 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Ticket\ManageTicketRequest;
 use App\Models\Config\Variable;
 use App\Models\Master\Category;
-use App\Models\Master\Location;
-use App\Models\Master\Person;
 use App\Models\Ticket\Ticket;
 use App\Models\Ticket\Tracking;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -24,17 +21,7 @@ class ManageTicketController extends Controller
 
     public function create()
     {
-        $persons = Person::where('state', 1)->where('isClient', 1)->get();
-        $locations = Location::where('state', 1)->where(function ($query) {
-            $query->where('company_id', Auth::user()->current_company_id)
-                  ->orWhere('company_id', 1);
-        })->orderBy('name')->get();
-        $categories = Category::where('state', 1)->where(function ($query) {
-            $query->where('company_id', Auth::user()->current_company_id)
-                  ->orWhere('company_id', 1);
-        })->orderBy('name')->get();
-        $users = User::all();
-        return view('ticket.manage.create', compact('persons', 'locations', 'categories', 'users'));
+        return view('ticket.manage.create');
     }
 
     public function store(ManageTicketRequest $request)
@@ -46,11 +33,12 @@ class ManageTicketController extends Controller
             Ticket::create([
                 'date' => $request->date,
                 'date2' => Carbon::now()->addDays($days),
+                'name' => $request->name,
                 'company_id' => Auth::user()->current_company_id,
-                'person_id' => $request->person_id,
                 'location_id' => $request->location_id,
                 'category_id' => $request->category_id,
                 'category2_id' => $request->category2_id,
+                'item_id' => $request->item_id,
                 'text' => $request->text,
                 'state' => 2,
                 'user_id' => Auth::user()->id,
@@ -67,17 +55,7 @@ class ManageTicketController extends Controller
 
     public function edit(Ticket $manage_ticket)
     {
-        $persons = Person::where('state', 1)->where('isClient', 1)->get();
-        $locations = Location::where('state', 1)->where(function ($query) {
-            $query->where('company_id', Auth::user()->current_company_id)
-                  ->orWhere('company_id', 1);
-        })->get();
-        $categories = Category::where('state', 1)->where(function ($query) {
-            $query->where('company_id', Auth::user()->current_company_id)
-                  ->orWhere('company_id', 1);
-        })->get();
-        $users = User::all();
-        return view('ticket.manage.edit', compact('manage_ticket', 'persons', 'locations', 'categories', 'users'));
+        return view('ticket.manage.edit', compact('manage_ticket'));
     }
 
     public function update(ManageTicketRequest $request, Ticket $manage_ticket)
@@ -89,10 +67,11 @@ class ManageTicketController extends Controller
             $manage_ticket->update([
                 'date' => $request->date,
                 'date2' => Carbon::now()->addDays($days),
-                'person_id' => $request->person_id,
+                'name' => $request->name,
                 'location_id' => $request->location_id,
                 'category_id' => $request->category_id,
                 'category2_id' => $request->category2_id,
+                'item_id' => $request->item_id,
                 'text' => $request->text,
                 'state' => 2,
                 'user2_id' => $request->user2_id,
