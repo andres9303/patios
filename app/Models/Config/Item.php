@@ -2,6 +2,8 @@
 
 namespace App\Models\Config;
 
+use App\Models\Master\Space;
+use App\Models\Project\Project;
 use Illuminate\Database\Eloquent\Model;
 
 class Item extends Model
@@ -16,5 +18,20 @@ class Item extends Model
     public function ref()
     {
         return $this->belongsTo(Item::class);
+    }
+
+    public function spaces()
+    {
+        return $this->hasMany(Space::class);
+    }
+
+    public function spaces2()
+    {
+        return $this->hasMany(Space::class);
+    }
+
+    public function projects()
+    {
+        return $this->hasMany(Project::class);
     }
 }

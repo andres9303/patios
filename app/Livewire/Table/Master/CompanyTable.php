@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Table\Master;
 
-use app\models\master\Company;
+use App\Models\Master\Company;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\View\View;
@@ -125,18 +125,18 @@ final class CompanyTable extends PowerGridComponent
     public function filters(): array
     {
         return [
-            Filter::inputText('name')->operators(['contains']),
-            Filter::inputText('state')->operators(['contains']),
-            Filter::inputText('prefix')->operators(['contains']),
-            Filter::inputText('address')->operators(['contains']),
-            Filter::inputText('phone')->operators(['contains']),
-            Filter::inputText('email')->operators(['contains']),
-            Filter::inputText('head1')->operators(['contains']),
-            Filter::inputText('head2')->operators(['contains']),
-            Filter::inputText('head3')->operators(['contains']),
-            Filter::inputText('foot1')->operators(['contains']),
-            Filter::inputText('foot2')->operators(['contains']),
-            Filter::inputText('foot3')->operators(['contains']),
+            Filter::inputText('name', 'companies.name')->operators(['contains']),
+            Filter::inputText('state', 'companies.state')->operators(['contains']),
+            Filter::inputText('prefix', 'companies.prefix')->operators(['contains']),
+            Filter::inputText('address', 'companies.address')->operators(['contains']),
+            Filter::inputText('phone', 'companies.phone')->operators(['contains']),
+            Filter::inputText('email', 'companies.email')->operators(['contains']),
+            Filter::inputText('head1', 'companies.head1')->operators(['contains']),
+            Filter::inputText('head2', 'companies.head2')->operators(['contains']),
+            Filter::inputText('head3', 'companies.head3')->operators(['contains']),
+            Filter::inputText('foot1', 'companies.foot1')->operators(['contains']),
+            Filter::inputText('foot2', 'companies.foot2')->operators(['contains']),
+            Filter::inputText('foot3', 'companies.foot3')->operators(['contains']),
         ];
     }
 

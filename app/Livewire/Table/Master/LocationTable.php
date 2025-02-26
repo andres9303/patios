@@ -92,11 +92,11 @@ final class LocationTable extends PowerGridComponent
     public function filters(): array
     {
         return [
-            Filter::inputText('code')->operators(['contains']),
-            Filter::inputText('name')->operators(['contains']),
-            Filter::inputText('text')->operators(['contains']),
-            Filter::inputText('parent_name')->operators(['contains']),
-            Filter::inputText('state')->operators(['contains']),
+            Filter::inputText('code', 'locations.code')->operators(['contains']),
+            Filter::inputText('name', 'locations.name')->operators(['contains']),
+            Filter::inputText('text', 'locations.text')->operators(['contains']),
+            Filter::inputText('parent_name', 'parent.name')->operators(['contains']),
+            Filter::inputText('state', 'locations.state')->operators(['contains']),
         ];
     }
 

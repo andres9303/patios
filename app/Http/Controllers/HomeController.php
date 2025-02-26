@@ -28,21 +28,21 @@ class HomeController extends Controller
         $resolve_tickets = Ticket::query()
                             ->where('tickets.company_id', auth()->user()->current_company_id)
                             ->where('tickets.user2_id', auth()->user()->id)
-                            ->where('tickets.state', '<>', 0)
+                            ->where('tickets.state', '<>', 1)
                             ->whereNotIn('tickets.category2_id', [$tracking2, $tracking3])
                             ->count();
                             
         $resolve2_tickets = Ticket::query()
                             ->where('tickets.company_id', auth()->user()->current_company_id)
                             ->where('tickets.user2_id', auth()->user()->id)
-                            ->where('tickets.state', '<>', 0)
+                            ->where('tickets.state', '<>', 1)
                             ->whereIn('tickets.category2_id', [$tracking2])
                             ->count();
 
         $resolve3_tickets = Ticket::query()
                             ->where('tickets.company_id', auth()->user()->current_company_id)
                             ->where('tickets.user2_id', auth()->user()->id)
-                            ->where('tickets.state', '<>', 0)
+                            ->where('tickets.state', '<>', 1)
                             ->whereIn('tickets.category2_id', [$tracking3])
                             ->count();
                         

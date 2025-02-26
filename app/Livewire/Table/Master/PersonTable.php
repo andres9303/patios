@@ -124,18 +124,18 @@ final class PersonTable extends PowerGridComponent
     public function filters(): array
     {
         return [
-            Filter::inputText('identification')->operators(['contains']),
-            Filter::inputText('name')->operators(['contains']),
-            Filter::inputText('email')->operators(['contains']),
-            Filter::inputText('phone')->operators(['contains']),
-            Filter::inputText('address')->operators(['contains']),
-            Filter::inputText('whatsapp')->operators(['contains']),
-            Filter::inputText('text')->operators(['contains']),
-            Filter::inputText('isClient')->operators(['contains']),
-            Filter::inputText('isSupplier')->operators(['contains']),
-            Filter::inputText('isEmployee')->operators(['contains']),
-            Filter::inputText('state')->operators(['contains']),
-            Filter::datepicker('birth'),
+            Filter::inputText('identification', 'people.identification')->operators(['contains']),
+            Filter::inputText('name', 'people.name')->operators(['contains']),
+            Filter::inputText('email', 'people.email')->operators(['contains']),
+            Filter::inputText('phone', 'people.phone')->operators(['contains']),
+            Filter::inputText('address', 'people.address')->operators(['contains']),
+            Filter::inputText('whatsapp', 'people.whatsapp')->operators(['contains']),
+            Filter::inputText('text', 'people.text')->operators(['contains']),
+            Filter::inputText('isClient', 'people.isClient')->operators(['contains']),
+            Filter::inputText('isSupplier', 'people.isSupplier')->operators(['contains']),
+            Filter::inputText('isEmployee', 'people.isEmployee')->operators(['contains']),
+            Filter::inputText('state', 'people.state')->operators(['contains']),
+            Filter::datepicker('birth', 'people.birth'),
         ];
     }
 

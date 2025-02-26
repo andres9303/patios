@@ -18,7 +18,7 @@ class CategoryRequest extends FormRequest
             'name' => 'required|string|max:200',
             'text' => 'nullable|string',
             'days' => 'nullable|integer',
-            'ref_id' => 'nullable|exists:locations,id',
+            'ref_id' => 'nullable|exists:categories,id',
             'state' => 'boolean',
         ];
     }

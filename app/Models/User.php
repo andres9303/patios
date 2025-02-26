@@ -30,7 +30,14 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name', 'username', 'email', 'password',
+        'name', 
+        'username', 
+        'email', 
+        'password',
+        'telegram_chat_id',
+        'telegram_code',
+        'telegram_code_expires_at',
+        'telegram_linked_at'
     ];
 
     /**
@@ -64,6 +71,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'telegram_code_expires_at' => 'datetime',
+            'telegram_linked_at' => 'datetime',
         ];
     }
 

@@ -4,13 +4,17 @@ namespace App\Http\Controllers\Ticket;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Ticket\ManageTicketRequest;
+use App\Mail\NotificationTicketUser;
 use App\Models\Config\Variable;
 use App\Models\Master\Category;
 use App\Models\Ticket\Ticket;
 use App\Models\Ticket\Tracking;
+use App\Models\User;
+use App\Services\TelegramCodeService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class ManageTicketController extends Controller
 {
@@ -30,7 +34,7 @@ class ManageTicketController extends Controller
         try {
             $days = Category::find($request->category_id)->days ?? Variable::where('cod', 'TKT_DAYS')->first()->concept;
 
-            Ticket::create([
+            $ticket = Ticket::create([
                 'date' => $request->date,
                 'date2' => Carbon::now()->addDays($days),
                 'name' => $request->name,
@@ -45,7 +49,38 @@ class ManageTicketController extends Controller
                 'user2_id' => $request->user2_id,
             ]);
 
-            DB::commit();
+            if (Variable::where('cod', 'TKT_NTF_EM')->first()->concept == 1) {
+                $user2 = User::find($request->user2_id);
+
+                $data = [
+                    'numTicket' => $ticket->id,
+                    'company' => $ticket->company->name,
+                    'location' => $ticket->location->name,
+                    'category' => $ticket->category->name,
+                    'category2' => $ticket->category2->name,
+                    'name' => $ticket->name,
+                    'text' => $ticket->text,
+                ];
+
+                Mail::to($user2->email)->send(new NotificationTicketUser($data));
+            }
+
+            if (Variable::where('cod', 'TKT_NTF_TG')->first()->concept == 1)
+            {
+                if (User::find($request->user2_id)->telegram_chat_id) 
+                {
+                    $telegramService = app(TelegramCodeService::class);
+                    $telegramService->sendTelegramMessage($user2->telegram_chat_id, "🎫 Nuevo ticket asignado: #".$ticket->id." - ".$ticket->company->name
+                        ."\n📍 Ubicación: ".$ticket->location->name
+                        ."\n📂 Subcategoría: ".$ticket->category2->name
+                        ."\n📄 Descripción: ".$ticket->text
+                        ."\n📅 Fecha límite: ".$ticket->date2
+                        ."\n🔗 ".route('ticket.show', $ticket->id));
+                }                
+            }
+
+            DB::commit();            
+
             return redirect()->route('manage-ticket.index')->with('success', 'El ticket ha sido creado y asignado correctamente.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -77,7 +112,39 @@ class ManageTicketController extends Controller
                 'user2_id' => $request->user2_id,
             ]);
 
+            if (Variable::where('cod', 'TKT_NTF_EM')->first()->concept == 1) {
+                $user2 = User::find($request->user2_id);
+
+                $data = [
+                    'numTicket' => $manage_ticket->id,
+                    'company' => $manage_ticket->company->name,
+                    'location' => $manage_ticket->location->name,
+                    'category' => $manage_ticket->category->name,
+                    'category2' => $manage_ticket->category2->name,
+                    'name' => $manage_ticket->name,
+                    'text' => $manage_ticket->text,
+                ];
+
+                Mail::to($user2->email)->send(new NotificationTicketUser($data));
+            }
+
+            if (Variable::where('cod', 'TKT_NTF_TG')->first()->concept == 1)
+            {
+                if (User::find($request->user2_id)->telegram_chat_id) 
+                {
+                    $telegramService = app(TelegramCodeService::class);
+                    $telegramService->sendTelegramMessage($user2->telegram_chat_id, "🎫 Nuevo ticket asignado: #".$manage_ticket->id." - ".$manage_ticket->company->name
+                        ."\n📍 Ubicación: ".$manage_ticket->location->name
+                        ."\n📂 Subcategoría: ".$manage_ticket->category2->name
+                        ."\n📄 Descripción: ".$manage_ticket->text
+                        ."\n📅 Fecha límite: ".$manage_ticket->date2
+                        ."\n🔗 ".route('ticket.show', $manage_ticket->id));
+                }
+                
+            }
+
             DB::commit();
+
             return redirect()->route('manage-ticket.index')->with('success', 'El ticket ha sido actualizado y asignado correctamente.');
         } catch (\Exception $e) {
             DB::rollBack();

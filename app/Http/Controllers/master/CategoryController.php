@@ -17,7 +17,10 @@ class CategoryController extends Controller
 
     public function create()
     {
-        $categories = Category::where('company_id', Auth::user()->current_company_id)->get();
+        $categories = Category::where('company_id', Auth::user()->current_company_id)
+                                ->whereNull('ref_id')
+                                ->where('state', 1)
+                                ->get();
         return view('master.category.create', compact('categories'));
     }
 
@@ -47,6 +50,8 @@ class CategoryController extends Controller
     {
         $categories = Category::where('company_id', Auth::user()->current_company_id)
                                     ->where('id', '!=', $category->id)
+                                    ->whereNull('ref_id')
+                                    ->where('state', 1)
                                     ->get();
         return view('master.category.edit', compact('category', 'categories'));
     }

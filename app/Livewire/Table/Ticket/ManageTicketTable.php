@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Table\Ticket;
 
+use App\Models\Config\Item;
 use App\Models\Ticket\Ticket;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -154,18 +155,18 @@ final class ManageTicketTable extends PowerGridComponent
     public function filters(): array
     {
         return [
-            Filter::inputText('date')->operators(['contains']),
-            Filter::inputText('date2')->operators(['contains']),
-            Filter::inputText('date3')->operators(['contains']),
-            Filter::inputText('name')->operators(['contains']),
-            Filter::inputText('location_name')->operators(['contains']),
-            Filter::inputText('category_name')->operators(['contains']),
-            Filter::inputText('sub_category_name')->operators(['contains']),
-            Filter::inputText('priority')->operators(['contains']),
-            Filter::inputText('text')->operators(['contains']),
-            Filter::inputText('state_det')->operators(['contains']),
-            Filter::inputText('reporter_name')->operators(['contains']),
-            Filter::inputText('assigned_name')->operators(['contains']),
+            Filter::datetimepicker('date', 'tickets.'),
+            Filter::datetimepicker('date2', 'tickets.date2'),
+            Filter::datetimepicker('date3', 'tickets.date3'),
+            Filter::inputText('name', 'tickets.name')->operators(['contains']),
+            Filter::inputText('location_name', 'locations.name')->operators(['contains']),
+            Filter::inputText('category_name', 'category.name')->operators(['contains']),
+            Filter::inputText('sub_category_name', 'sub_category.name')->operators(['contains']),
+            Filter::select('priority', 'tickets.item_id')->dataSource(Item::where('catalog_id', 3)->orderBy('order')->get())->optionLabel('name')->optionValue('id'),
+            Filter::inputText('text', 'tickets.text')->operators(['contains']),
+            Filter::select('state_det', 'tickets.state')->dataSource([['name' => 'Pendiente', 'id' => 0], ['name' => 'Cerrado', 'id' => 1], ['name' => 'Asignado', 'id' => 2]])->optionLabel('name')->optionValue('id'),
+            Filter::inputText('reporter_name', 'reporter.name')->operators(['contains']),
+            Filter::inputText('assigned_name', 'assigned.name')->operators(['contains']),
         ];
     }
 

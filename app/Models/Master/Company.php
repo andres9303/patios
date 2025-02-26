@@ -2,6 +2,7 @@
 
 namespace App\Models\Master;
 
+use App\Models\Project\Project;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
@@ -27,5 +28,8 @@ class Company extends Model
         return $this->belongsToMany(User::class)->withPivot('role_id');
     }
 
-    
+    public function projects()
+    {
+        return $this->hasMany(Project::class);
+    }    
 }

@@ -97,11 +97,11 @@ final class CategoryTable extends PowerGridComponent
     public function filters(): array
     {
         return [
-            Filter::inputText('code')->operators(['contains']),
-            Filter::inputText('name')->operators(['contains']),
-            Filter::inputText('text')->operators(['contains']),
-            Filter::inputText('parent_name')->operators(['contains']),
-            Filter::inputText('state')->operators(['contains']),
+            Filter::inputText('code', 'categories.code')->operators(['contains']),
+            Filter::inputText('name', 'categories.name')->operators(['contains']),
+            Filter::inputText('text', 'categories.text')->operators(['contains']),
+            Filter::inputText('parent_name', 'parent.name')->operators(['contains']),
+            Filter::inputText('state', 'categories.state')->operators(['contains']),
         ];
     }
 
