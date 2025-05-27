@@ -27,6 +27,8 @@ class PersonRequest extends FormRequest
             'isSupplier' => ['nullable', 'boolean'],
             'isEmployee' => ['nullable', 'boolean'],
             'state' => ['nullable', 'boolean'],
+            'companies' => 'nullable|array',
+            'companies.*' => 'exists:companies,id',
         ];
     }
 }

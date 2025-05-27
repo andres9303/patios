@@ -7,6 +7,7 @@ use App\Http\Requests\project\ActivityRequest;
 use App\Models\Master\Unit;
 use App\Models\Project\Activity;
 use App\Models\Project\Project;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class ActivityController extends Controller
@@ -19,7 +20,8 @@ class ActivityController extends Controller
     public function create(Project $project)
     {
         $units = Unit::where('state', 1)->get();
-        return view('project.activity.create', compact('project', 'units'));
+        $users = User::all();
+        return view('project.activity.create', compact('project', 'units', 'users'));
     }
 
     public function store(ActivityRequest $request, Project $project)
@@ -43,8 +45,10 @@ class ActivityController extends Controller
                 'state' => $request->state ?? 1,
                 'cant' => $request->cant,
                 'value' => $request->value,
+                'cost' => $request->cost,
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
+                'user_id' => $request->user_id,
             ]);
 
             DB::commit();
@@ -58,7 +62,8 @@ class ActivityController extends Controller
     public function edit(Project $project, Activity $activity)
     {
         $units = Unit::where('state', 1)->get();
-        return view('project.activity.edit', compact('project', 'activity', 'units'));
+        $users = User::all();
+        return view('project.activity.edit', compact('project', 'activity', 'units', 'users'));
     }
 
     public function update(ActivityRequest $request, Project $project, Activity $activity)
@@ -82,8 +87,10 @@ class ActivityController extends Controller
                 'state' => $request->state ?? 1,
                 'cant' => $request->cant,
                 'value' => $request->value,
+                'cost' => $request->cost,
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
+                'user_id' => $request->user_id,
             ]);
 
             DB::commit();

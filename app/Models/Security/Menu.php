@@ -3,9 +3,13 @@
 namespace App\Models\Security;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Menu extends Model
 {
+    use LogsActivity;
+    
     protected $fillable = [
         'code',
         'name',
@@ -24,5 +28,13 @@ class Menu extends Model
     public function children()
     {
         return $this->hasMany(self::class, 'menu_id');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

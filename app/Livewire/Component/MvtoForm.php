@@ -2,8 +2,8 @@
 
 namespace App\Livewire\Component;
 
-use App\Models\Master\Person;
 use App\Models\Master\Product;
+use App\Models\Master\Space;
 use App\Models\Mvto;
 use App\Models\Order;
 use App\Models\Project\Activity;
@@ -13,23 +13,33 @@ use Livewire\Component;
 class MvtoForm extends Component
 {
     public $menuId;
+    public $docId;
     public $route;
     public $doc;
     public $isActivities;
     public $calculateValue;
+    public $searchTerm = '';
+
+    public $labelCode;
+    public $labelDocument;
+    public $labelPerson;
+    public $labelDate;
 
     public $categories;
     public $selectedCategory = 'all';
+    public $selectedClass = '0';
     public $products_base = [];
     public $products = [];
     public $orders = [];
     public $persons = [];
     public $activities = [];
+    public $spaces = [];
     public $person_id;
     public $date;
     public $code;
     public $num;
     public $person;
+    public $text;
     public $subtotal = 0;
     public $iva = 0;
     public $total = 0;
@@ -41,9 +51,7 @@ class MvtoForm extends Component
         'num' => 'required|string|max:50',
     ];
 
-    //OJO: INTEGRIDAD DEL DOCUMENTO EDITABLE: agregar el idDoc como hide al formulario y validarlo en el controlador
-
-    public function mount($menuId, $route, $products, $categories, $isActivities = false, $calculateValue = false, $doc = null)
+    public function mount($menuId, $route, $products, $categories, $persons, $isActivities = false, $calculateValue = false, $doc = null, $labelCode = 'Código Factura', $labelDocument = 'Número Factura', $labelPerson = 'Proveedor', $labelDate = 'Fecha factura')
     {
         $this->menuId = $menuId;
         $this->route = $route;
@@ -51,11 +59,13 @@ class MvtoForm extends Component
         $this->calculateValue = $calculateValue;
         $this->doc = $doc;
         if ($this->doc) {
+            $this->docId = $this->doc->id;
             $this->person_id = $this->doc->person_id;
             $this->date = $this->doc->date;
             $this->code = $this->doc->code;
             $this->num = $this->doc->num;
             $this->person = $this->doc->person;
+            $this->text = $this->doc->text;
         }
         else {
             $orders = Order::where('menu_id', $this->menuId)
@@ -65,33 +75,59 @@ class MvtoForm extends Component
                 ->get();
 
             if ($orders->count() > 0) {
-                $this->person_id = $orders->first()->doc->person_id;
-                $this->date = $orders->first()->doc->date;
-                $this->code = $orders->first()->doc->code;
-                $this->num = $orders->first()->doc->num;
-                $this->person = $orders->first()->doc->person;
+                $this->doc = $orders->first()->doc;
+                $this->docId = $this->doc->id;
+                $this->person_id = $this->doc->person_id;
+                $this->date = $this->doc->date;
+                $this->code = $this->doc->code;
+                $this->num = $this->doc->num;
+                $this->person = $this->doc->person;
+                $this->text = $this->doc->text;
             }
         }
 
+        $this->labelCode = $labelCode;
+        $this->labelDocument = $labelDocument;
+        $this->labelPerson = $labelPerson;
+        $this->labelDate = $labelDate;
+
         $this->products_base = $products;
         $this->categories = $categories;
-        $this->persons = Person::where('isSupplier', 1)->where('state', 1)->get();
+        $this->persons = $persons;
         if ($this->isActivities)
             $this->loadActivities();
         
         $this->loadProducts();
         $this->loadOrders();
+        $this->loadSpaces();
     }
 
     public function loadProducts()
     {
-        if ($this->selectedCategory === 'all') {
-            $this->products = $this->products_base;
-        } else {
-            $this->products = $this->products_base->filter(function ($product) {
+        // Filtro por categoría
+        $filtered = $this->selectedCategory === 'all'
+            ? $this->products_base
+            : $this->products_base->filter(function ($product) {
                 return $product->item_id == $this->selectedCategory;
             });
+
+        // Filtro por clase de producto (rotación)
+        if ($this->selectedClass !== 'all') {
+            $filtered = $filtered->filter(function ($product) {
+                return $product->class == $this->selectedClass;
+            });
         }
+
+        // Filtro por término de búsqueda
+        if (!empty($this->searchTerm)) {
+            $searchTerm = strtolower($this->searchTerm);
+            $filtered = $filtered->filter(function ($product) use ($searchTerm) {
+                return str_contains(strtolower($product->name), $searchTerm) ||
+                       str_contains(strtolower($product->code), $searchTerm);
+            });
+        }
+        
+        $this->products = $filtered;
     }
 
     public function loadOrders()
@@ -107,9 +143,15 @@ class MvtoForm extends Component
     {
         $this->activities = Activity::where('state', 1)            
             ->whereHas('project', function ($query) {
-                $query->where('state', 1)
-                    ->where('type', 0);
-            })->get();
+                $query->where('state', 1);
+            })->get()->sortBy(function($activity) {
+                return $activity->project->type; // Ordenar la colección final
+            });
+    }
+
+    public function loadSpaces()
+    {
+        $this->spaces = Space::where('state', 1)->where('company_id', Auth::user()->current_company_id)->orderBy('name')->get();
     }
 
     public function calculateTotals()
@@ -154,7 +196,7 @@ class MvtoForm extends Component
     public function updateOrder($orderId, $field, $value)
     {
         $order = Order::find($orderId);
-        $order->{$field} = $value;
+        $order->{$field} = $value ?? 0;
         $order->save();
         $this->loadOrders();
     }
@@ -164,7 +206,7 @@ class MvtoForm extends Component
         Order::destroy($orderId);
         $this->loadOrders();
     }
-    
+
     public function render()
     {
         return view('livewire.component.mvto-form');

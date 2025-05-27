@@ -9,9 +9,13 @@ use App\Models\Master\Unit;
 use App\Models\Project\Activity;
 use App\Models\Security\Menu;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Order extends Model
 {
+    use LogsActivity;
+    
     protected $fillable = [
         'doc_id',
         'menu_id',
@@ -20,6 +24,7 @@ class Order extends Model
         'unit_id',
         'cant',
         'value',
+        'cant2',
         'iva',
         'activity_id',
         'space_id',
@@ -65,5 +70,13 @@ class Order extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

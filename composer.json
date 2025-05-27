@@ -14,6 +14,7 @@
         "livewire/livewire": "^3.0",
         "openspout/openspout": "^4.26",
         "power-components/livewire-powergrid": "^6.0",
+        "spatie/laravel-activitylog": "^4.10",
         "spatie/laravel-html": "^3.11"
     },
     "require-dev": {

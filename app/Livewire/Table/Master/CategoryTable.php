@@ -6,6 +6,7 @@ use App\Models\Master\Category;
 use App\Models\Master\Company;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Components\SetUp\Exportable;
@@ -43,7 +44,7 @@ final class CategoryTable extends PowerGridComponent
 
         return Category::query()
             ->leftJoin('categories as parent', 'parent.id', '=', 'categories.ref_id')
-            ->whereIn('categories.company_id', [auth()->user()->current_company_id, $company_all->id])
+            ->whereIn('categories.company_id', [Auth::user()->current_company_id, $company_all->id])
             ->select([
                 'categories.*',
                 'parent.name as parent_name',

@@ -5,9 +5,13 @@ namespace App\Models\Config;
 use App\Models\Master\Space;
 use App\Models\Project\Project;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Item extends Model
 {
+    use LogsActivity;
+    
     protected $fillable = ['id', 'name', 'text', 'order', 'factor', 'catalog_id', 'item_id'];
 
     public function catalog()
@@ -33,5 +37,13 @@ class Item extends Model
     public function projects()
     {
         return $this->hasMany(Project::class);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

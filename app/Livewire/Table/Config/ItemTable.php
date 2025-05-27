@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Table\Config;
 
+use App\Models\Config\Catalog;
 use App\Models\Config\Item;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -71,7 +72,7 @@ final class ItemTable extends PowerGridComponent
     public function columns(): array
     {
         return [
-            Column::make('Lista', 'catalog_name', 'catalogs.name')
+            Column::make('Lista', 'catalog_name', 'catalogs.id')
                 ->sortable()
                 ->searchable(),
 
@@ -96,7 +97,7 @@ final class ItemTable extends PowerGridComponent
     public function filters(): array
     {
         return [
-            Filter::inputText('catalog_name', 'catalogs.name')->operators(['contains']),
+            Filter::select('catalog_name', 'catalogs.id')->dataSource(Catalog::orderBy('name')->get())->optionLabel('name')->optionValue('id'),
             Filter::inputText('name', 'items.name')->operators(['contains']),
             Filter::inputText('base_name', 'base.name')->operators(['contains']),
             Filter::inputText('text', 'items.text')->operators(['contains']),

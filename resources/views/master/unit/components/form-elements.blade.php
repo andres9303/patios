@@ -58,4 +58,5 @@
             ->placeholder('Factor')
             ->attribute('step', '0.000001') !!}
     </div>
+    @livewire('component.company-selector', ['selected' => old('companies', isset($unit) ? $unit->companies->pluck('id')->toArray() : [])])
 </div>

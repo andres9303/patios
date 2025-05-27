@@ -12,7 +12,7 @@
 
         <x-slot name="content">
             <div class="mt-8">
-                @livewire('component.mvto-form', ['menuId' => $menuId, 'route' => 'bill.store', 'products' => $products, 'categories' => $categories, 'isActivities' => 1, 'calculateValue' => 0, 'doc' => $bill])
+                @livewire('component.mvto-form', ['menuId' => $menuId, 'route' => 'bill.store', 'products' => $products, 'categories' => $categories, 'persons' => $persons, 'isActivities' => 1, 'calculateValue' => 0, 'doc' => $bill])
             </div>
         </x-slot>
     </x-crud-index>

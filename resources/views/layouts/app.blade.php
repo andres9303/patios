@@ -15,6 +15,7 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
 
         <!-- Styles -->
         @livewireStyles
@@ -52,5 +53,7 @@
         @stack('modals')
 
         @livewireScripts
+        
+        @stack('scripts')
     </body>
 </html>

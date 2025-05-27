@@ -7,6 +7,7 @@ use App\Models\Config\Variable;
 use App\Models\Ticket\Ticket;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Components\SetUp\Exportable;
@@ -50,8 +51,8 @@ final class TrakingTable extends PowerGridComponent
             ->leftJoin('categories as sub_category', 'sub_category.id', '=', 'tickets.category2_id')
             ->leftJoin('users as reporter', 'reporter.id', '=', 'tickets.user_id')
             ->leftJoin('users as assigned', 'assigned.id', '=', 'tickets.user2_id')
-            ->where('tickets.company_id', auth()->user()->current_company_id)
-            ->where('tickets.user2_id', auth()->user()->id)
+            ->where('tickets.company_id', Auth::user()->current_company_id)
+            ->where('tickets.user2_id', Auth::user()->id)
             ->whereNotIn('tickets.category2_id', [$tracking2, $tracking3])
             ->select([
                 'tickets.*',
@@ -83,13 +84,17 @@ final class TrakingTable extends PowerGridComponent
     {
         return PowerGrid::fields()
             ->add('id')
+            ->add('date_format', fn($row) => $this->getStyledValue($row, $row->date))
             ->add('date')
+            ->add('date2_format', fn($row) => $this->getStyledValue($row, $row->date2))
             ->add('date2')
+            ->add('date3_format', fn($row) => $this->getStyledValue($row, $row->date3))
             ->add('date3')
             ->add('name')
             ->add('location_name')
             ->add('category_name')
             ->add('sub_category_name')
+            ->add('priority_format', fn($row) => $this->getStyledValue($row, $row->priority))
             ->add('priority')
             ->add('text', fn($row) => substr($row->text, 0, 35).'...')
             ->add('state')
@@ -98,10 +103,28 @@ final class TrakingTable extends PowerGridComponent
             ->add('assigned_name');
     }
 
+    private function getStyledValue($row, $value): string
+    {
+        $dateWithDays = Carbon::parse($row->date2);
+        $now = Carbon::now();
+
+        if($row->state == 1) {
+            $class = 'bg-green-600 text-white w-full h-full text-center';
+        } elseif ($dateWithDays <= $now) {
+            $class = 'bg-red-600 text-white w-full h-full text-center';
+        } elseif ($dateWithDays <= $now->addDays(3)) {
+            $class = 'bg-yellow-600 text-white w-full h-full text-center';
+        } else {
+            $class = 'w-full h-full text-center';
+        }
+
+        return '<div class="' . $class . '">' . $value . '</div>';
+    }
+
     public function columns(): array
     {
         return [
-            COlumn::make('ID', 'id', 'tickets.id')
+            Column::make('ID', 'id', 'tickets.id')
                 ->searchable()
                 ->sortable(),
 
@@ -114,17 +137,45 @@ final class TrakingTable extends PowerGridComponent
                 ->visibleInExport(true)
                 ->hidden(),
 
+            Column::make('Prioridad', 'priority_format', 'items.name')
+                ->sortable()
+                ->searchable()
+                ->visibleInExport(false),
+
             Column::make('Prioridad', 'priority', 'items.name')
                 ->sortable()
-                ->searchable(),
+                ->searchable()
+                ->visibleInExport(true),
+
+            Column::make('Fecha', 'date_format', 'tickets.date')
+                ->sortable()
+                ->searchable()
+                ->visibleInExport(false),
 
             Column::make('Fecha', 'date', 'tickets.date')
                 ->sortable()
-                ->searchable(),
+                ->searchable()
+                ->visibleInExport(true),
+
+            Column::make('Vence', 'date2_format', 'tickets.date2')
+                ->sortable()
+                ->searchable()
+                ->visibleInExport(false),
+
+            Column::make('Vence', 'date2', 'tickets.date2')
+                ->sortable()
+                ->searchable()
+                ->visibleInExport(true),
+
+            Column::make('Fecha Solución', 'date3_format', 'tickets.date3')
+                ->sortable()
+                ->searchable()
+                ->visibleInExport(false),
 
             Column::make('Fecha Solución', 'date3', 'tickets.date3')
                 ->sortable()
-                ->searchable(),
+                ->searchable()
+                ->visibleInExport(true),
 
             Column::make('Locación/Habitación', 'location_name', 'locations.name')
                 ->sortable()
@@ -161,14 +212,14 @@ final class TrakingTable extends PowerGridComponent
     public function filters(): array
     {
         return [
-            Filter::datetimepicker('date', 'tickets.'),
-            Filter::datetimepicker('date2', 'tickets.date2'),
-            Filter::datetimepicker('date3', 'tickets.date3'),
+            Filter::datetimepicker('date_format', 'tickets.date'),
+            Filter::datetimepicker('date2_format', 'tickets.date2'),
+            Filter::datetimepicker('date3_format', 'tickets.date3'),
             Filter::inputText('name', 'tickets.name')->operators(['contains']),
             Filter::inputText('location_name', 'locations.name')->operators(['contains']),
             Filter::inputText('category_name', 'category.name')->operators(['contains']),
             Filter::inputText('sub_category_name', 'sub_category.name')->operators(['contains']),
-            Filter::select('priority', 'tickets.item_id')->dataSource(Item::where('catalog_id', 3)->orderBy('order')->get())->optionLabel('name')->optionValue('id'),
+            Filter::select('priority_format', 'tickets.item_id')->dataSource(Item::where('catalog_id', 3)->orderBy('order')->get())->optionLabel('name')->optionValue('id'),
             Filter::inputText('text', 'tickets.text')->operators(['contains']),
             Filter::select('state_det', 'tickets.state')->dataSource([['name' => 'Pendiente', 'id' => 0], ['name' => 'Cerrado', 'id' => 1], ['name' => 'Asignado', 'id' => 2]])->optionLabel('name')->optionValue('id'),
             Filter::inputText('reporter_name', 'reporter.name')->operators(['contains']),

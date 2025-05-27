@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Ticket;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Ticket\ManageTicketRequest;
 use App\Mail\NotificationTicketUser;
+use App\Models\Config\Item;
 use App\Models\Config\Variable;
-use App\Models\Master\Category;
 use App\Models\Ticket\Ticket;
 use App\Models\Ticket\Tracking;
 use App\Models\User;
@@ -32,11 +32,11 @@ class ManageTicketController extends Controller
     {
         DB::beginTransaction();
         try {
-            $days = Category::find($request->category_id)->days ?? Variable::where('cod', 'TKT_DAYS')->first()->concept;
+            $days = (int)Item::find($request->item_id)->factor ?? Variable::where('cod', 'TKT_DAYS')->first()->concept;
 
             $ticket = Ticket::create([
                 'date' => $request->date,
-                'date2' => Carbon::now()->addDays($days),
+                'date2' => Carbon::parse($request->date)->addDays($days),
                 'name' => $request->name,
                 'company_id' => Auth::user()->current_company_id,
                 'location_id' => $request->location_id,
@@ -49,9 +49,8 @@ class ManageTicketController extends Controller
                 'user2_id' => $request->user2_id,
             ]);
 
+            $user2 = User::find($request->user2_id);
             if (Variable::where('cod', 'TKT_NTF_EM')->first()->concept == 1) {
-                $user2 = User::find($request->user2_id);
-
                 $data = [
                     'numTicket' => $ticket->id,
                     'company' => $ticket->company->name,
@@ -97,11 +96,11 @@ class ManageTicketController extends Controller
     {
         DB::beginTransaction();
         try {
-            $days = Category::find($request->category_id)->days ?? Variable::where('cod', 'TKT_DAYS')->first()->concept;
+            $days = (int)Item::find($request->item_id)->factor ?? (Variable::where('cod', 'TKT_DAYS')->first()->concept ?? 0);
 
             $manage_ticket->update([
                 'date' => $request->date,
-                'date2' => Carbon::now()->addDays($days),
+                'date2' => Carbon::parse($request->date)->addDays($days),
                 'name' => $request->name,
                 'location_id' => $request->location_id,
                 'category_id' => $request->category_id,
@@ -130,7 +129,8 @@ class ManageTicketController extends Controller
 
             if (Variable::where('cod', 'TKT_NTF_TG')->first()->concept == 1)
             {
-                if (User::find($request->user2_id)->telegram_chat_id) 
+                $user2 = User::find($request->user2_id);
+                if ($user2->telegram_chat_id) 
                 {
                     $telegramService = app(TelegramCodeService::class);
                     $telegramService->sendTelegramMessage($user2->telegram_chat_id, "🎫 Nuevo ticket asignado: #".$manage_ticket->id." - ".$manage_ticket->company->name
@@ -174,5 +174,12 @@ class ManageTicketController extends Controller
         }
         
         return redirect()->route('manage-ticket.index')->with('success', 'El ticket ha sido eliminado correctamente.');
+    }
+
+    public function attachment(Ticket $manage_ticket)
+    {
+        $ticket = Ticket::find($manage_ticket->id); 
+        $url = 'manage-ticket';
+        return view('ticket.ticket.attachment', compact('ticket', 'url'));
     }
 }

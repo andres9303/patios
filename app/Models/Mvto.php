@@ -4,12 +4,17 @@ namespace App\Models;
 
 use App\Models\Config\Item;
 use App\Models\Master\Product;
+use App\Models\Master\Space;
 use App\Models\Master\Unit;
 use App\Models\Project\Activity;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Mvto extends Model
 {
+    use LogsActivity;
+    
     protected $table = 'mvtos';
     protected $fillable = [
         'doc_id', 
@@ -35,7 +40,8 @@ class Mvto extends Model
         'concept', 
         'ref', 
         'costu', 
-        'activity_id'
+        'activity_id',
+        'space_id'
     ];
 
     public function doc()
@@ -76,5 +82,18 @@ class Mvto extends Model
     public function activity()
     {
         return $this->belongsTo(Activity::class);
+    }
+
+    public function space()
+    {
+        return $this->belongsTo(Space::class);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

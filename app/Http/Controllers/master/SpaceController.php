@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\master;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\master\SpaceRequest;
+use App\Http\Requests\Master\SpaceRequest;
 use App\Models\Config\Item;
 use App\Models\Master\Space;
 use Illuminate\Http\Request;
@@ -31,6 +31,7 @@ class SpaceController extends Controller
         try {
             Space::create([
                 'name' => $request->name,
+                'company_id' => auth()->user()->current_company_id,
                 'text' => $request->text,
                 'order' => $request->order,
                 'state' => $request->state ?? 1,

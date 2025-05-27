@@ -6,10 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\cost\DirectPurchaseRequest;
 use App\Models\Config\Item;
 use App\Models\Doc;
+use App\Models\Master\Person;
 use App\Models\Master\Product;
 use App\Models\Mvto;
 use App\Models\Order;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -24,20 +24,26 @@ class DirectPurchaseController extends Controller
 
     public function create()
     {
+        Order::where('menu_id', $this->menuId)
+            ->where('company_id', Auth::user()->current_company_id)
+            ->where('user_id', Auth::id())
+            ->delete();
+            
         $menuId = $this->menuId;
-        $products = $products = Product::where('state', 1)
-                        ->where('isinventory', 1)
-                        ->get();
-        $categories = Item::where('catalog_id', 203)->get();
+        $products = Product::where('state', 1)->where('isinventory', 1)->whereHas('companies', function ($query) {
+            $query->where('company_id', Auth::user()->current_company_id);
+        })->orderBy('name')->get();
+        $categories = Item::where('catalog_id', 203)->orderBy('name')->get();
+        $persons = Person::where('isSupplier', 1)->where('state', 1)->get();
 
-        return view('cost.direct_purchase.create', compact('menuId', 'products', 'categories'));
+        return view('cost.direct_purchase.create', compact('menuId', 'products', 'categories', 'persons'));
     }
 
     public function store(DirectPurchaseRequest $request)
     {
         DB::beginTransaction();
         try {
-            $orders = Order::where('menu_id', $this->menuId,)
+            $orders = Order::where('menu_id', $this->menuId)
                 ->where('company_id', Auth::user()->current_company_id)
                 ->where('user_id', Auth::id())
                 ->get();
@@ -52,8 +58,8 @@ class DirectPurchaseController extends Controller
                 }
             }
 
-            if ($orders->where('doc_id')->isNotEmpty()) {
-                $doc = Doc::find($orders->first()->doc_id);
+            if (isset($request->doc_id)) {
+                $doc = Doc::find($request->doc_id);
                 $doc->update([
                     'code' => $request->code,
                     'num' => $request->num,
@@ -70,6 +76,7 @@ class DirectPurchaseController extends Controller
                                 }),
                     'state' => 1,
                     'user_id' => Auth::id(),
+                    'text' => $request->text,
                 ]);
 
                 Mvto::where('doc_id', $doc->id)->update([
@@ -104,26 +111,44 @@ class DirectPurchaseController extends Controller
                                 }),
                     'state' => 1,
                     'user_id' => Auth::id(),
+                    'text' => $request->text,
                 ]);
             }            
 
             foreach ($orders as $order) {
-                Mvto::create([
-                    'doc_id' => $doc->id,
-                    'product_id' => $order->product_id,
-                    'unit_id' => $order->unit_id,
-                    'cant' => $order->cant,
-                    'valueu' => $order->value,
-                    'iva' => $order->iva,
-                    'valuet' => $order->cant * $order->value * (1 + $order->iva / 100),                    
-                    'product2_id' => $order->product_id,
-                    'unit2_id' => $order->unit_id,
-                    'cant2' => $order->cant,
-                    'valueu2' => $order->value,
-                    'iva2' => $order->iva,
-                    'valuet2' => $order->cant * $order->value * (1 + $order->iva / 100),
-                    'state' => 1,
-                ]);
+                $mvto = Mvto::where('doc_id', $order->doc_id)->where('product_id', $order->product_id)->where('unit_id', $order->unit_id)->where('state', 0)->first();
+                if ($mvto) {
+                    $mvto->update([
+                        'cant' => $order->cant,
+                        'valueu' => $order->value,
+                        'iva' => $order->iva,
+                        'valuet' => $order->cant * $order->value * (1 + $order->iva / 100),                    
+                        'product2_id' => $order->product_id,
+                        'unit2_id' => $order->unit_id,
+                        'cant2' => $order->cant,
+                        'valueu2' => $order->value,
+                        'iva2' => $order->iva,
+                        'valuet2' => $order->cant * $order->value * (1 + $order->iva / 100),
+                        'state' => 1,
+                    ]);
+                } else {
+                    Mvto::create([
+                        'doc_id' => $doc->id,
+                        'product_id' => $order->product_id,
+                        'unit_id' => $order->unit_id,
+                        'cant' => $order->cant,
+                        'valueu' => $order->value,
+                        'iva' => $order->iva,
+                        'valuet' => $order->cant * $order->value * (1 + $order->iva / 100),                    
+                        'product2_id' => $order->product_id,
+                        'unit2_id' => $order->unit_id,
+                        'cant2' => $order->cant,
+                        'valueu2' => $order->value,
+                        'iva2' => 0,
+                        'valuet2' => $order->cant * $order->value,
+                        'state' => 1,
+                    ]);
+                }
             }
             
             Order::where('menu_id', $this->menuId,)
@@ -142,10 +167,11 @@ class DirectPurchaseController extends Controller
     public function edit(Doc $direct_purchase)
     {
         $menuId = $this->menuId;
-        $products = $products = Product::where('state', 1)
-                        ->where('isinventory', 1)
-                        ->get();
-        $categories = Item::where('catalog_id', 203)->get();
+        $products = Product::where('state', 1)->where('isinventory', 1)->whereHas('companies', function ($query) {
+            $query->where('company_id', Auth::user()->current_company_id);
+        })->orderBy('name')->get();
+        $categories = Item::where('catalog_id', 203)->orderBy('name')->get();
+        $persons = Person::where('isSupplier', 1)->where('state', 1)->get();
 
         DB::beginTransaction();
         try {
@@ -155,17 +181,20 @@ class DirectPurchaseController extends Controller
             ->delete();
 
             foreach ($direct_purchase->mvtos as $order) {
-                Order::create([
-                    'doc_id' => $direct_purchase->id,
-                    'menu_id' => $this->menuId,
-                    'company_id' => Auth::user()->current_company_id,
-                    'product_id' => $order->product_id,
+                if ($order->state == 1 && $order->cant <> 0) 
+                {
+                    Order::create([
+                        'doc_id' => $direct_purchase->id,
+                        'menu_id' => $this->menuId,
+                        'company_id' => Auth::user()->current_company_id,
+                        'product_id' => $order->product_id,
                     'unit_id' => $order->unit_id,
                     'cant' => $order->cant > 0 ? $order->cant : $order->cant * -1,
                     'value' => $order->valueu,
                     'iva' => $order->iva,
                     'user_id' => Auth::id(),
-                ]);
+                    ]);
+                }
             }
             DB::commit();
         } catch (\Exception $e) {
@@ -173,7 +202,7 @@ class DirectPurchaseController extends Controller
             return back()->with('error', 'Ha ocurrido un error, por favor reportar con el siguiente mensaje: '.$e->getMessage());
         }
 
-        return view('cost.direct_purchase.edit', compact('menuId', 'products', 'categories', 'direct_purchase'));
+        return view('cost.direct_purchase.edit', compact('menuId', 'products', 'categories', 'persons', 'direct_purchase'));
     }
 
     public function destroy(Doc $direct_purchase)
@@ -184,7 +213,8 @@ class DirectPurchaseController extends Controller
                 'subtotal' => 0,
                 'iva' => 0,
                 'total' => 0,
-                'state' => 0
+                'state' => 0,
+                'text' => null,
             ]);
             $direct_purchase->mvtos()->update([
                 'cant' => 0,
@@ -203,5 +233,10 @@ class DirectPurchaseController extends Controller
             DB::rollBack();
             return back()->with('error', 'Ha ocurrido un error, por favor reportar con el siguiente mensaje: '.$e->getMessage());
         }
+    }
+
+    public function attachment(Doc $direct_purchase)
+    {
+        return view('cost.direct_purchase.attachment', compact('direct_purchase'));
     }
 }

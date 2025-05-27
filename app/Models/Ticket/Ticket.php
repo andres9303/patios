@@ -9,9 +9,13 @@ use App\Models\Master\Location;
 use App\Models\Master\Person;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Ticket extends Model
 {
+    use LogsActivity;
+    
     protected $fillable = [
         'date',
         'date2',
@@ -72,5 +76,13 @@ class Ticket extends Model
     public function attachments()
     {
         return $this->morphMany(Attachment::class, 'attachmentable');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

@@ -21,12 +21,6 @@
     </div>
     
     <div class="mt-4">
-        {!! html()->label('Estado', 'state') !!}
-        {!! html()->checkbox('state', isset($product) ? $product->state : false)
-            ->class('block mt-1 w-full' . ($errors->has('state') ? ' is-invalid' : '')) !!}
-    </div>
-    
-    <div class="mt-4">
         {!! html()->label('¿Es inventariable?', 'isinventory') !!}
         {!! html()->checkbox('isinventory', isset($product) ? $product->isinventory : false)
             ->class('block mt-1 w-full' . ($errors->has('isinventory') ? ' is-invalid' : '')) !!}
@@ -37,5 +31,26 @@
         {!! html()->select('item_id', $items->pluck('name', 'id'), isset($product) ? $product->item_id : null)
             ->class('block mt-1 w-full' . ($errors->has('item_id') ? ' is-invalid' : ''))
             ->placeholder('Seleccione una categoría') !!}
+    </div>
+
+    <div class="mt-4">
+        {!! html()->label('Área', 'type') !!}
+        {!! html()->select('type', $areas->pluck('name', 'id'), isset($product) ? $product->type : null)
+            ->class('block mt-1 w-full' . ($errors->has('type') ? ' is-invalid' : ''))
+            ->placeholder('Seleccione un área') !!}
+    </div>
+
+    <div class="mt-4">
+        {!! html()->label('¿Baja rotación?', 'class') !!}
+        {!! html()->checkbox('class', isset($product) ? $product->class : false)
+            ->class('block mt-1 w-full' . ($errors->has('class') ? ' is-invalid' : '')) !!}
+    </div>
+
+    @livewire('component.company-selector', ['selected' => old('companies', isset($product) ? $product->companies->pluck('id')->toArray() : [])])
+
+    <div class="mt-4">
+        {!! html()->label('Estado', 'state') !!}
+        {!! html()->checkbox('state', isset($product) ? $product->state : false)
+            ->class('block mt-1 w-full' . ($errors->has('state') ? ' is-invalid' : '')) !!}
     </div>
 </div>

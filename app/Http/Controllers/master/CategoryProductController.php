@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\master;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\master\CategoryProductRequest;
+use App\Http\Requests\Master\CategoryProductRequest;
 use App\Models\Config\Item;
 use App\Models\Master\Product;
 use Illuminate\Support\Facades\DB;

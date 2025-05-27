@@ -60,6 +60,7 @@ final class PersonTable extends PowerGridComponent
             ->add('isClient')
             ->add('isSupplier')
             ->add('isEmployee')
+            ->add('isOperator')
             ->add('state');
     }
 
@@ -112,6 +113,11 @@ final class PersonTable extends PowerGridComponent
                 ->sortable()
                 ->searchable(),
 
+            Column::make('esOperador', 'isOperator', 'people.isOperator')
+                ->toggleable(false, 'Si', 'No')
+                ->sortable()
+                ->searchable(),
+
             Column::make('Estado', 'state', 'people.state')
                 ->toggleable(false, 'Activo', 'Inactivo')
                 ->sortable()
@@ -152,7 +158,7 @@ final class PersonTable extends PowerGridComponent
                 'active' => true
             ],
             [
-                'name' => 'Eliminar',
+                'name' => 'Inactivar',
                 'route' => 'person.destroy',
                 'params' => ['person' => $row->id],
                 'color' => 'red',

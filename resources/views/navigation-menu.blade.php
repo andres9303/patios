@@ -14,7 +14,7 @@
 
     <!-- Menú lateral derecho -->
     <div :class="open ? 'translate-x-0' : 'translate-x-full'" class="fixed inset-y-0 right-0 w-64 bg-indigo-800 text-white transform transition-transform duration-300 z-40">
-        <div class="flex flex-col h-full">
+        <div class="flex flex-col h-full overflow-y-auto">
             <!-- Imagen del usuario -->
             <div class="flex items-center justify-center h-24 bg-indigo-900">
                 <img class="h-20 w-20 rounded-full object-cover" src="{{ asset('img/logo.png') }}" alt="{{ Auth::user()->name }}" />

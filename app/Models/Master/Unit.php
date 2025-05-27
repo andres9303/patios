@@ -4,9 +4,13 @@ namespace App\Models\Master;
 
 use App\Models\Project\Activity;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Unit extends Model
 {
+    use LogsActivity;
+    
     protected $table = 'units';
     protected $fillable = [
         'name',
@@ -37,5 +41,18 @@ class Unit extends Model
     public function activities()
     {
         return $this->hasMany(Activity::class, 'unit_id');
+    }
+
+    public function companies() 
+    {
+        return $this->belongsToMany(Company::class);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

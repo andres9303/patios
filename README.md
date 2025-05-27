@@ -1,89 +1,104 @@
-# Patios
+# Patios - Sistema de Gestión Integral
 
-## Descripción del Proyecto
-Este proyecto es una aplicación web modular desarrollada con Laravel, Livewire y la plantilla Jetstream. El sistema está diseñado para dar solución al cliente en diferentes áreas para el manejo y control de la información.
+## 🚀 Descripción del Proyecto
 
-### Aplicación Modular
-- **Asignación de permisos y accesos:** Manejo detallado de permisos para diferentes roles de usuario, garantizando que cada módulo y acción tenga un acceso restringido basado en las políticas de usuario.
-- **Diseño adaptable:** La aplicación utiliza diferentes plantillas para usuarios con distintos roles, lo que asegura una experiencia de usuario coherente y personalizada.
+Patios es una aplicación web modular desarrollada con Laravel, Livewire y Jetstream, diseñada para ofrecer una solución integral en la gestión de espacios, mantenimientos, proyectos y soporte. El sistema está construido con un enfoque en la escalabilidad y la facilidad de uso, permitiendo una gestión eficiente de múltiples áreas operativas.
 
-### Primer Módulo: Mesa de Ayuda y Front Desk
-Este primer módulo combina funcionalidades de una mesa de ayuda y un front desk, lo que permite gestionar solicitudes de servicio, reportes de incidentes, y soporte directo. Los usuarios pueden crear y gestionar tickets, los cuales serán manejados de acuerdo con las prioridades y niveles de acceso asignados.
+## 🛠️ Módulos Principales
 
-### Segundo Módulo: Gestión de Sistemas y Subsistemas
-Este módulo permitirá:
-- **Registro de sistemas y subsistemas:** Crear diferentes sistemas (como hotel, habitaciones, piscina, etc.) y subsistemas estructurales asociados a cada uno.
-- **Gestión de mantenimientos y costos:** Cargar y gestionar los mantenimientos necesarios para cada sistema, registrar sus costos y generar órdenes de trabajo.
-- **Programación de mantenimientos periódicos:** Programar mantenimientos y acciones preventivas o correctivas, con una bitácora de los eventos de mantenimiento realizados para cada sistema y subsistema.
-- **Hoja de vida de los sistemas:** Mantener un historial completo de cada sistema y subsistema, ayudando a calcular el costo de mantener cada uno de ellos funcional.
+### 1. Gestión de Espacios y CheckLists
+- **Plantillas de CheckList:** Crea y personaliza plantillas para diferentes tipos de inspecciones.
+- **CheckLists Dinámicos:** Genera listas de verificación con diferentes tipos de campos (texto, número, fecha, booleano).
+- **Gestión de Respuestas:** Almacena respuestas estructuradas con soporte para descripciones adicionales.
+- **Historial Completo:** Mantén un registro histórico de todas las inspecciones realizadas.
 
-## Tecnologías Utilizadas
+### 2. Mesa de Ayuda y Gestión de Tickets
+- **Sistema de Tickets:** Gestión completa de solicitudes de servicio e incidencias.
+- **Seguimiento en Tiempo Real:** Actualizaciones en tiempo real del estado de los tickets.
+- **Asignación de Responsables:** Distribución eficiente de tareas entre equipos.
+- **Soporte para Archivos Adjuntos:** Capacidad para adjuntar imágenes y documentos a los tickets.
 
-- **Framework:** Laravel
-- **Frontend:** Laravel Jetstream (con Livewire y Tailwind CSS)
-- **Interactividad:** Livewire
-- **Base de Datos:** MySQL
+### 3. Gestión de Proyectos y Actividades
+- **Planificación de Proyectos:** Crea y gestiona proyectos con sus respectivas actividades.
+- **Seguimiento de Avances:** Monitorea el progreso de cada proyecto y sus tareas asociadas.
+- **Asignación de Recursos:** Asigna responsables y recursos a las diferentes actividades.
 
-## Requisitos Previos
+### 4. Inventario y Gestión de Costos
+- **Control de Inventario:** Registro y seguimiento de productos y materiales.
+- **Movimientos de Inventario:** Entradas, salidas y ajustes de inventario.
+- **Cálculo de Costos:** Seguimiento detallado de costos asociados a proyectos y actividades.
 
-- **PHP >= 8.1**
-- **Composer**
-- **MySQL**
-- **Node.js y NPM** (para compilación de assets con Laravel Mix)
+### 5. Reportes y Análisis
+- **Reportes Personalizables:** Genera informes detallados de todas las áreas del sistema.
+- **Tableros de Control:** Visualización intuitiva de métricas clave.
+- **Exportación de Datos:** Capacidad para exportar reportes en diferentes formatos.
 
-## Instalación
-Sigue estos pasos para instalar y configurar el proyecto en tu entorno local:
+## 🏗️ Estructura Técnica
 
-1. Clona el repositorio:
-    ```bash
-    git clone https://github.com/andres9303/patios.git
-    ```
+### Tecnologías Principales
+- **Backend:** PHP 8.1+, Laravel 10+
+- **Frontend:** Livewire, Tailwind CSS, Alpine.js
+- **Base de Datos:** MySQL 8.0+
+- **Autenticación:** Laravel Jetstream con Fortify
+- **Despliegue:** Compatible con la mayoría de servidores web (Apache/Nginx)
 
-2. Navega al directorio del proyecto:
-    ```bash
-    cd patios
-    ```
+### Requisitos del Sistema
+- PHP >= 8.1
+- Composer
+- MySQL 8.0+
+- Node.js 16+ y NPM
 
-3. Instala las dependencias:
-    ```bash
-    composer install
-    npm install
-    ```
+## 🚀 Instalación
 
-4. Configura el archivo `.env`:
-    ```bash
-    cp .env.example .env
-    php artisan key:generate
-    ```
+1. **Clonar el repositorio**
+   ```bash
+   git clone https://github.com/andres9303/patios.git
+   cd patios
+   ```
 
-5. Configura la base de datos en el archivo `.env` y luego ejecuta las migraciones:
-    ```bash
-    php artisan migrate --seed
-    ```
+2. **Instalar dependencias**
+   ```bash
+   composer install
+   npm install
+   ```
 
-6. Compila los assets:
-    ```bash
-    npm run dev
-    ```
+3. **Configuración del entorno**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-7. Inicia el servidor de desarrollo:
-    ```bash
-    php artisan serve
-    ```
+4. **Configuración de la base de datos**
+   - Crear una base de datos MySQL
+   - Configurar las variables de conexión en el archivo `.env`
 
-## Uso
+5. **Ejecutar migraciones y seeders**
+   ```bash
+   php artisan migrate --seed
+   ```
 
-### Roles y Permisos
-El sistema incluye un módulo completo de gestión de roles y permisos, donde podrás asignar distintos niveles de acceso a los usuarios.
+6. **Compilar assets**
+   ```bash
+   npm run dev
+   # O para producción:
+   # npm run build
+   ```
 
-### Mesa de Ayuda y Front Desk
-Permite a los usuarios:
+7. **Iniciar el servidor**
+   ```bash
+   php artisan serve
+   ```
 
-1. Crear y gestionar tickets de soporte.
-2. Visualizar el estado de los tickets en curso.
+8. **Acceder al sistema**
+   - URL: http://localhost:8000
+   - Credenciales por defecto (si se usó el seeder):
+     - Email: admin@example.com
+     - Contraseña: password
 
-### Gestión de Sistemas y Subsistemas
-Permite registrar y organizar los sistemas estructurales y sus subsistemas, programar y gestionar mantenimientos, y registrar los costos asociados para llevar un control exhaustivo de los activos.
+## 🔐 Seguridad
+
+- Control de acceso basado en roles (RBAC)
+- Protección CSRF
 
 ## Estructura del Proyecto
 
@@ -93,5 +108,6 @@ Permite registrar y organizar los sistemas estructurales y sus subsistemas, prog
 - **resources/views:** Vistas de la aplicación para cada uno de los módulos y plantillas personalizadas según el rol del usuario.
 - **routes/web.php:** Definición de las rutas de la aplicación, incluyendo la gestión de permisos y accesos.
 
-## Licencia
-Este proyecto está licenciado bajo la Licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
+## 📄 Licencia
+
+Este proyecto está licenciado bajo la Licencia MIT.

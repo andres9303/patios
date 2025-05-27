@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Security;
+namespace App\Http\Controllers\security;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Security\MenuRequest;

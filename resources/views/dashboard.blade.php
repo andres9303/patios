@@ -86,5 +86,45 @@
                 @endcan
             </div>       
         </div>
+
+        
+
+        <!-- Calendario semanal -->
+        <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
+            <h1 class="mb-5 text-gray-400 font-bold">Calendario de pendientes</h1>
+            <livewire:component.weekly-calendar/>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <!-- Gráfico de Categorías de Tickets -->
+            @can('view-menu', "report-ticket-history")
+            <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
+                <livewire:grap.ticket-category-grap/>
+            </div>
+            @endcan
+
+            <!-- Gráfico de Prioridad de Tickets -->
+            @can('view-menu', "report-ticket-history")
+            <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
+                <livewire:grap.ticket-priority-grap/>
+            </div>
+            @endcan
+        </div>
+        
+        <!-- Actividades pendientes -->
+        @can('view-menu', "advance-project")
+        <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
+            <h1 class="mb-5 text-gray-400 font-bold">Actividades pendientes</h1>
+            <livewire:table.project.activities-pending-table/>
+        </div>
+        @endcan
+
+        <!-- Programación -->
+        @can('view-menu', "schedule")
+        <div class="p-6 sm:px-20 bg-white border-b border-gray-200">
+            <h1 class="mb-5 text-gray-400 font-bold">Proyectos pendientes de programación</h1>
+            <livewire:table.dashboard.schedule-table/>
+        </div>
+        @endcan
     </div>
 </x-app-layout>

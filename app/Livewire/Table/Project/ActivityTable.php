@@ -2,7 +2,9 @@
 
 namespace App\Livewire\Table\Project;
 
+use App\Models\Master\Unit;
 use App\Models\Project\Activity;
+use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\View\View;
@@ -42,9 +44,11 @@ final class ActivityTable extends PowerGridComponent
         return Activity::query()
             ->where('project_id', $this->project->id)
             ->leftJoin('units', 'units.id', '=', 'activities.unit_id')
+            ->leftJoin('users', 'users.id', '=', 'activities.user_id')
             ->select([
                 'activities.*',
                 'units.name as unit_name',
+                'users.name as user_name',
             ])
             ->orderBy('activities.code');
     }
@@ -66,6 +70,9 @@ final class ActivityTable extends PowerGridComponent
             ->add('cant_format', fn ($row) => number_format($row->cant, 4))
             ->add('value')
             ->add('value_format', fn ($row) => number_format($row->value))
+            ->add('cost')
+            ->add('cost_format', fn ($row) => number_format($row->cost))
+            ->add('user_name')
             ->add('start_date')
             ->add('start_date_format', fn ($row) => Carbon::parse($row->start_date)->format('d/m/Y'))
             ->add('end_date')
@@ -105,14 +112,27 @@ final class ActivityTable extends PowerGridComponent
                 ->visibleInExport(true)
                 ->hidden(),
 
-            Column::make('Valor unitario estimado', 'value_format', 'activities.value')
+            Column::make('Valor unitario', 'value_format', 'activities.value')
                 ->sortable()
                 ->searchable()
                 ->visibleInExport(false),
 
-            Column::make('Valor unitario estimado', 'value', 'activities.value')
+            Column::make('Valor unitario', 'value', 'activities.value')
                 ->visibleInExport(true)
                 ->hidden(),
+
+            Column::make('Costo unitario', 'cost_format', 'activities.cost')
+                ->sortable()
+                ->searchable()
+                ->visibleInExport(false),
+
+            Column::make('Costo unitario', 'cost', 'activities.cost')
+                ->visibleInExport(true)
+                ->hidden(),
+
+            Column::make('Responsable', 'user_name', 'users.name')
+                ->sortable()
+                ->searchable(),
 
             Column::make('Fecha de Inicio', 'start_date_format', 'activities.start_date')
                 ->sortable()
@@ -141,13 +161,12 @@ final class ActivityTable extends PowerGridComponent
         return [
             Filter::inputText('code', 'activities.code')->operators(['contains']),
             Filter::inputText('name', 'activities.name')->operators(['contains']),
-            Filter::inputText('unit_name', 'units.name')->operators(['contains']),
+            Filter::select('unit_name', 'units.id')->dataSource(Unit::orderBy('name')->get())->optionLabel('name')->optionValue('id'),
             Filter::inputText('text', 'activities.text')->operators(['contains']),
             Filter::inputText('state', 'activities.state')->operators(['contains']),
-            Filter::inputText('cant', 'activities.cant')->operators(['contains']),
-            Filter::inputText('value', 'activities.value')->operators(['contains']),
-            Filter::inputText('start_date', 'activities.start_date')->operators(['contains']),
-            Filter::inputText('end_date', 'activities.end_date')->operators(['contains']),
+            Filter::select('user_name', 'users.id')->dataSource(User::orderBy('name')->get())->optionLabel('name')->optionValue('id'),
+            Filter::datetimepicker('start_date', 'activities.start_date'),
+            Filter::datetimepicker('end_date', 'activities.end_date'),
         ];
     }
 

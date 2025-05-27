@@ -42,7 +42,9 @@ class TicketForm extends Component
 
         $this->priorities = Item::where('catalog_id', 3)->orderBy('order')->get() ?? collect();
 
-        $this->users = User::all() ?? collect();
+        $this->users = User::whereHas('companies', function ($query) {
+            $query->whereIn('company_user.company_id', [1, Auth::user()->current_company_id]);
+        })->get() ?? collect();
 
         $this->loadSubcategories();
     }

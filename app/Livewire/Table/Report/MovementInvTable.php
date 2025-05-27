@@ -6,6 +6,7 @@ use App\Models\Doc;
 use App\Models\Mvto;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Components\SetUp\Exportable;
 use PowerComponents\LivewirePowerGrid\Facades\Filter;
@@ -50,7 +51,7 @@ final class MovementInvTable extends PowerGridComponent
             ->where('docs.state', 1) // Filtro para docs.state = 1
             ->where('mvtos.state', 1) // Filtro para mvtos.state = 1
             ->where('products.isinventory', 1) // Filtro para products.isinventory = 1
-            ->where('docs.company_id', auth()->user()->current_company_id) // Filtro
+            ->where('docs.company_id', Auth::user()->current_company_id) // Filtro
             ->select([
                 'mvtos.id',
                 'menus.name as menu_name',
@@ -87,10 +88,11 @@ final class MovementInvTable extends PowerGridComponent
             ->add('product_name')
             ->add('unit_name')
             ->add('cant')
-            ->add('cant_format', fn ($row) => number_format($row->cant))
+            ->add('cant_format', fn ($row) => number_format($row->cant, 2))
             ->add('valueu')
             ->add('valueu_format', fn ($row) => number_format($row->valueu))
             ->add('iva')
+            ->add('iva_format', fn ($row) => number_format($row->iva))
             ->add('valuet')
             ->add('valuet_format', fn ($row) => number_format($row->valuet));
     }
@@ -153,9 +155,14 @@ final class MovementInvTable extends PowerGridComponent
                 ->visibleInExport(true)
                 ->hidden(),
 
-            Column::make('IVA', 'iva', 'mvtos.iva')
+            Column::make('IVA', 'iva_format', 'mvtos.iva')
                 ->sortable()
-                ->searchable(),
+                ->searchable()
+                ->visibleInExport(false),
+
+            Column::make('IVA', 'iva', 'mvtos.iva')
+                ->visibleInExport(true)
+                ->hidden(),
 
             Column::make('Valor Total', 'valuet_format', 'mvtos.valuet2')
                 ->sortable()

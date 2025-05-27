@@ -47,6 +47,14 @@
             ->placeholder('Valor')
             ->attribute('step', '0.0001') !!}
     </div>
+
+    <div class="mt-4">
+        {!! html()->label('Costo unitario estimado', 'cost') !!}
+        {!! html()->number('cost', isset($activity) ? $activity->cost : null)
+            ->class('block mt-1 w-full' . ($errors->has('cost') ? ' is-invalid' : ''))
+            ->placeholder('Valor')
+            ->attribute('step', '0.0001') !!}
+    </div>
     
     <div class="mt-4">
         {!! html()->label('Descripción', 'text') !!}
@@ -57,7 +65,14 @@
     
     <div class="mt-4">
         {!! html()->label('Estado', 'state') !!}
-        {!! html()->checkbox('state', isset($product) ? $product->state : false)
+        {!! html()->checkbox('state', isset($activity) ? $activity->state : false)
             ->class('block mt-1 w-full' . ($errors->has('state') ? ' is-invalid' : '')) !!}
+    </div>
+
+    <div class="mt-4">
+        {!! html()->label('Responsable', 'user_id') !!}
+        {!! html()->select('user_id', $users->pluck('name', 'id'), isset($activity) ? $activity->user_id : null)
+            ->class('block mt-1 w-full' . ($errors->has('user_id') ? ' is-invalid' : ''))
+            ->placeholder('Seleccione un responsable') !!}
     </div>
 </div>

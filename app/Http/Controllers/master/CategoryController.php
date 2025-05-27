@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Master;
+namespace App\Http\Controllers\master;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Master\CategoryRequest;

@@ -22,7 +22,7 @@
     
     <div class="mt-4">
         {!! html()->label('Estado', 'state') !!}
-        {!! html()->checkbox('state', isset($product) ? $product->state : false)
+        {!! html()->checkbox('state', isset($project) ? $project->state : false)
             ->class('block mt-1 w-full' . ($errors->has('state') ? ' is-invalid' : '')) !!}
     </div>
     

@@ -113,6 +113,7 @@ class TicketController extends Controller
 
     public function attachment(Ticket $ticket)
     {
-        return view('ticket.ticket.attachment', compact('ticket'));
+        $url = 'ticket';
+        return view('ticket.ticket.attachment', compact('ticket', 'url'));
     }
 }

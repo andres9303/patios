@@ -5,6 +5,7 @@ namespace App\Livewire\Table\Cost;
 use App\Models\Doc;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Components\SetUp\Exportable;
@@ -16,6 +17,7 @@ use PowerComponents\LivewirePowerGrid\Traits\WithExport;
 
 final class BillTable extends PowerGridComponent
 {
+    private int $menu_id = 501; 
     use WithExport;
 
     public string $tableName = 'lpg-bill-table';
@@ -39,8 +41,8 @@ final class BillTable extends PowerGridComponent
     public function datasource(): Builder
     {
         return Doc::query()
-            ->where('menu_id', 501) // Filtro por menu_id = 501
-            ->where('company_id', auth()->user()->current_company_id)
+            ->where('menu_id', $this->menu_id) 
+            ->where('company_id', Auth::user()->current_company_id)
             ->leftJoin('people', 'people.id', '=', 'docs.person_id')
             ->select([
                 'docs.*',
@@ -160,6 +162,15 @@ final class BillTable extends PowerGridComponent
                 'color' => 'red',
                 'icon' => 'fa fa-trash-alt',
                 'type' => 'delete',
+                'active' => true
+            ],
+            [
+                'name' => 'Adjuntos',
+                'route' => 'bill.attachment.index',
+                'params' => ['bill' => $row->id],
+                'color' => 'yellow',
+                'icon' => 'fa fa-paperclip',
+                'type' => 'button',
                 'active' => true
             ],
         ];

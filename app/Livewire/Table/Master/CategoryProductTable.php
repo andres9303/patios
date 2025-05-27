@@ -17,7 +17,7 @@ use PowerComponents\LivewirePowerGrid\Traits\WithExport;
 final class CategoryProductTable extends PowerGridComponent
 {
     use WithExport;
-
+    private int $catalog_id = 203;
     public string $tableName = 'lpg-category-product-table';
 
     public function setUp(): array
@@ -39,7 +39,7 @@ final class CategoryProductTable extends PowerGridComponent
     public function datasource(): Builder
     {
         return Item::query()
-            ->where('items.catalog_id', 203)
+            ->where('items.catalog_id', $this->catalog_id)
             ->select([
                 'items.*'
             ])

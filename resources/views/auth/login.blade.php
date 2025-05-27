@@ -22,7 +22,7 @@
 
             <div class="mt-4"> 
                 <x-label for="company_id" value="Empresa" />
-                <select id="company_id" name="company_id" class="mt-1 border px-2 py-2 block w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 shadow-sm" placeholder="Seleccione la empresa">
+                <select id="company_id" name="company_id" class="mt-1 border border-gray-300 rounded-md shadow-sm px-2 py-2 block w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 shadow-sm" placeholder="Seleccione la empresa">
                     @foreach ($companies as $company)
                         <option value="{{ $company->id }}">{{ $company->name }}</option>
                     @endforeach

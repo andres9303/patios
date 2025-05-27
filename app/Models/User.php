@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use App\Models\Master\Company;
+use App\Models\Project\Activity;
 use App\Models\Security\Role;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,10 +14,13 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class User extends Authenticatable
 {
     use HasApiTokens;
+    use LogsActivity;
 
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
@@ -110,5 +114,18 @@ class User extends Authenticatable
         return $this->belongsToMany(Role::class, 'company_user', 'user_id', 'role_id')
             ->withPivot('company_id')
             ->wherePivotIn('company_id', $companyIds);
+    }
+
+    public function activities()
+    {
+        return $this->hasMany(Activity::class);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

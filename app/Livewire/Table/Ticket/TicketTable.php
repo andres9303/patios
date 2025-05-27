@@ -6,6 +6,7 @@ use App\Models\Config\Item;
 use App\Models\Ticket\Ticket;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Components\SetUp\Exportable;
@@ -46,8 +47,8 @@ final class TicketTable extends PowerGridComponent
             ->leftJoin('categories as sub_category', 'sub_category.id', '=', 'tickets.category2_id')
             ->leftJoin('users as reporter', 'reporter.id', '=', 'tickets.user_id')
             ->leftJoin('users as assigned', 'assigned.id', '=', 'tickets.user2_id')
-            ->where('tickets.company_id', auth()->user()->current_company_id)
-            ->where('tickets.user_id', auth()->user()->id)
+            ->where('tickets.company_id', Auth::user()->current_company_id)
+            ->where('tickets.user_id', Auth::user()->id)
             ->select([
                 'tickets.*',
                 'items.name as priority',
@@ -156,7 +157,7 @@ final class TicketTable extends PowerGridComponent
     public function filters(): array
     {
         return [
-            Filter::datetimepicker('date', 'tickets.'),
+            Filter::datetimepicker('date', 'tickets.date'),
             Filter::datetimepicker('date2', 'tickets.date2'),
             Filter::datetimepicker('date3', 'tickets.date3'),
             Filter::inputText('name', 'tickets.name')->operators(['contains']),

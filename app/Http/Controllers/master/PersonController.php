@@ -26,9 +26,10 @@ class PersonController extends Controller
             $state = $request->state ?? 0;
             $isClient = $request->isClient ?? 0;
             $isSupplier = $request->isSupplier ?? 0;
+            $isOperator = $request->isOperator ?? 0;
             $isEmployee = $request->isEmployee ?? 0;
 
-            Person::create([
+            $person = Person::create([
                 'identification' => $request->identification,
                 'name' => $request->name,
                 'address' => $request->address,
@@ -40,9 +41,12 @@ class PersonController extends Controller
                 'birth' => $request->birth,
                 'isClient' => $isClient,
                 'isSupplier' => $isSupplier,
+                'isOperator' => $isOperator,
                 'isEmployee' => $isEmployee,
                 'state' => $state,
             ]);
+
+            $person->companies()->sync($request->companies);
 
             DB::commit();
             return redirect()->route('person.index')->with('success', 'Se ha registrado el tercero correctamente.');
@@ -64,6 +68,7 @@ class PersonController extends Controller
             $state = $request->state ?? 0;
             $isClient = $request->isClient ?? 0;
             $isSupplier = $request->isSupplier ?? 0;
+            $isOperator = $request->isOperator ?? 0;
             $isEmployee = $request->isEmployee ?? 0;
 
             $person->update([
@@ -78,9 +83,12 @@ class PersonController extends Controller
                 'birth' => $request->birth,
                 'isClient' => $isClient,
                 'isSupplier' => $isSupplier,
+                'isOperator' => $isOperator,
                 'isEmployee' => $isEmployee,
                 'state' => $state,
             ]);
+
+            $person->companies()->sync($request->companies);
 
             DB::commit();
             return redirect()->route('person.index')->with('success', 'Se ha actualizado el tercero correctamente.');

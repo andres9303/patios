@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\master;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\master\UnitRequest;
+use App\Http\Requests\Master\UnitRequest;
 use App\Models\Master\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -25,7 +25,7 @@ class UnitController extends Controller
     {
         DB::beginTransaction();
         try {
-            Unit::create([
+            $unit = Unit::create([
                 'name' => $request->name,
                 'unit' => $request->unit,
                 'time' => $request->time,
@@ -35,6 +35,8 @@ class UnitController extends Controller
                 'unit_id' => $request->unit_id,
                 'factor' => $request->factor,
             ]);
+
+            $unit->companies()->sync($request->companies);
 
             DB::commit();
             return redirect()->route('unit.index')->with('success', 'Se ha registrado la unidad correctamente.');
@@ -64,6 +66,8 @@ class UnitController extends Controller
                 'unit_id' => $request->unit_id,
                 'factor' => $request->factor,
             ]);
+
+            $unit->companies()->sync($request->companies);
 
             DB::commit();
             return redirect()->route('unit.index')->with('success', 'Se ha actualizado la unidad correctamente.');

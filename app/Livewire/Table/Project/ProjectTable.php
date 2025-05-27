@@ -2,9 +2,12 @@
 
 namespace App\Livewire\Table\Project;
 
+use App\Models\Config\Item;
+use App\Models\Master\Space;
 use App\Models\Project\Project;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Components\SetUp\Exportable;
@@ -39,7 +42,7 @@ final class ProjectTable extends PowerGridComponent
     public function datasource(): Builder
     {
         return Project::query()
-            ->where('company_id', auth()->user()->current_company_id) // Filtro por company_id del usuario
+            ->where('projects.company_id', Auth::user()->current_company_id) // Filtro por company_id del usuario
             ->leftJoin('items', 'items.id', '=', 'projects.item_id')
             ->leftJoin('spaces', 'spaces.id', '=', 'projects.space_id')
             ->select([
@@ -62,10 +65,28 @@ final class ProjectTable extends PowerGridComponent
             ->add('name')
             ->add('text')
             ->add('state')
+            ->add('state_det', fn($row) => $this->getStyledValue($row->state))
             ->add('concept')
             ->add('type')
             ->add('item_name')
             ->add('space_name');
+    }
+
+    private function getStyledValue($value): string
+    {
+        $class = match ($value) {
+            2 => 'bg-green-600 text-white w-full h-full text-center',
+            0 => 'bg-red-600 text-white w-full h-full text-center',
+            1 => 'bg-indigo-600 text-white w-full h-full text-center',
+        };
+
+        $text = match ($value) {
+            2 => 'Finalizado',
+            0 => 'Inactivo',
+            1 => 'Activo',
+        };
+
+        return '<div class="' . $class . '">' . $text . '</div>';
     }
 
     public function columns(): array
@@ -84,8 +105,7 @@ final class ProjectTable extends PowerGridComponent
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Estado', 'state', 'projects.state')
-                ->toggleable(false, 'Activo', 'Inactivo')
+            Column::make('Estado', 'state_det', 'projects.state')
                 ->sortable()
                 ->searchable(),
 
@@ -106,11 +126,11 @@ final class ProjectTable extends PowerGridComponent
         return [
             Filter::inputText('name', 'projects.name')->operators(['contains']),
             Filter::inputText('text', 'projects.text')->operators(['contains']),
-            Filter::inputText('state', 'projects.state')->operators(['contains']),
+            Filter::select('state', 'projects.state')->dataSource([['id' => 1, 'name' => 'Activo'], ['id' => 2, 'name' => 'Finalizado'], ['id' => 0, 'name' => 'Inactivo']])->optionLabel('name')->optionValue('id'),
             Filter::inputText('concept', 'projects.concept')->operators(['contains']),
-            Filter::inputText('type', 'projects.type')->operators(['contains']),
-            Filter::inputText('item_name', 'items.name')->operators(['contains']),
-            Filter::inputText('space_name', 'spaces.name')->operators(['contains']),
+            Filter::select('type', 'projects.type')->dataSource([['id' => 1, 'name' => 'Proyecto'], ['id' => 0, 'name' => 'Presupuesto']])->optionLabel('name')->optionValue('id'),
+            Filter::select('item_name', 'items.id')->dataSource(Item::where('catalog_id', 20801)->orderBy('order')->get())->optionLabel('name')->optionValue('id'),
+            Filter::select('space_name', 'spaces.id')->dataSource(Space::where('state', 1)->where('company_id', Auth::user()->current_company_id)->orderBy('name')->get())->optionLabel('name')->optionValue('id'),
         ];
     }
 
@@ -134,6 +154,24 @@ final class ProjectTable extends PowerGridComponent
                 'icon' => 'fas fa-tasks',
                 'type' => 'button',
                 'active' => true
+            ],
+            [
+                'name' => 'Finalizar',
+                'route' => 'project.complete',
+                'params' => ['project' => $row->id],
+                'color' => 'green',
+                'icon' => 'fas fa-check',
+                'type' => 'button',
+                'active' => $row->state == 1
+            ],
+            [
+                'name' => 'Reabrir',
+                'route' => 'project.open',
+                'params' => ['project' => $row->id],
+                'color' => 'blue',
+                'icon' => 'fas fa-unlock',
+                'type' => 'button',
+                'active' => $row->state == 2
             ],
             [
                 'name' => 'Eliminar',

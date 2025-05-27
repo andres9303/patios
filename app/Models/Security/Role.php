@@ -3,9 +3,13 @@
 namespace App\Models\Security;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Role extends Model
 {
+    use LogsActivity;
+    
     protected $fillable = [
         'name',
     ];
@@ -25,5 +29,13 @@ class Role extends Model
     public function shortcuts()
     {
         return $this->belongsToMany(Menu::class, 'menu_role');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

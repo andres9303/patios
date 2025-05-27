@@ -5,9 +5,13 @@ namespace App\Models\Ticket;
 use App\Models\Attachment;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Tracking extends Model
 {
+    use LogsActivity;
+    
     protected $fillable = [
         'ticket_id',
         'user_id',
@@ -30,5 +34,13 @@ class Tracking extends Model
     public function attachments()
     {
         return $this->morphMany(Attachment::class, 'attachmentable');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

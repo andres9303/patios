@@ -3,10 +3,15 @@
 namespace App\Models\Master;
 
 use App\Models\Config\Item;
+use App\Models\Project\Schedule;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Space extends Model
 {
+    use LogsActivity;
+    
     protected $table = 'spaces';
     protected $fillable = [
         'name',
@@ -17,6 +22,7 @@ class Space extends Model
         'item_id',
         'item2_id',
         'cant',
+        'company_id',
     ];
 
     public function parentSpace()
@@ -37,5 +43,23 @@ class Space extends Model
     public function item2()
     {
         return $this->belongsTo(Item::class);
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
+
+    public function schedules()
+    {
+        return $this->hasMany(Schedule::class);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

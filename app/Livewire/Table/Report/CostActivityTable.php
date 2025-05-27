@@ -6,6 +6,7 @@ use App\Models\Doc;
 use App\Models\Mvto;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Components\SetUp\Exportable;
@@ -45,16 +46,20 @@ final class CostActivityTable extends PowerGridComponent
             ->join('activities', 'activities.id', '=', 'mvtos.activity_id')
             ->join('projects', 'projects.id', '=', 'activities.project_id')
             ->join('units', 'units.id', '=', 'activities.unit_id')
-            ->where('mvtos.cant', '<>', 0) // Filtro para cant <> 0
-            ->where('docs.state', 1) // Filtro para docs.state = 1
-            ->where('mvtos.state', 1) // Filtro para mvtos.state = 1
+            ->where('mvtos.cant', '<>', 0) 
+            ->where('docs.state', 1) 
+            ->where('mvtos.state', 1) 
+            ->where('docs.company_id', Auth::user()->current_company_id)
+            ->where('projects.company_id', Auth::user()->current_company_id)
             ->select([
                 'activities.id',
                 'projects.name as project_name',
                 'activities.code',
                 'activities.name as activity_name',
+                DB::raw('MAX(activities.cant) as cant'),
+                DB::raw('MAX(activities.cost) as cost'),
                 'units.name as unit_name',
-                DB::raw('SUM(mvtos.cant * mvtos.costu) as cost'),
+                DB::raw('SUM(mvtos.cant * mvtos.costu) as cost_real'),
             ])
             ->groupBy('activities.id', 'projects.name', 'activities.code', 'activities.name', 'units.name')
             ->orderBy('projects.name');
@@ -72,8 +77,10 @@ final class CostActivityTable extends PowerGridComponent
             ->add('code')
             ->add('activity_name')
             ->add('unit_name')
-            ->add('cost')
-            ->add('cost_format', fn ($row) => number_format($row->cost));
+            ->add('cost', fn ($row) => $row->cost * $row->cant)
+            ->add('cost_format', fn ($row) => number_format($row->cost * $row->cant))
+            ->add('cost_real')
+            ->add('cost_real_format', fn ($row) => number_format($row->cost_real));
     }
 
     public function columns(): array
@@ -94,13 +101,22 @@ final class CostActivityTable extends PowerGridComponent
             Column::make('Unidad', 'unit_name', 'units.name')
                 ->sortable()
                 ->searchable(),
-
-            Column::make('Costo', 'cost_format')
+                
+            Column::make('Costo Estimado', 'cost_format')
                 ->sortable()
                 ->searchable()
                 ->visibleInExport(false),
 
-            Column::make('Costo', 'cost')
+            Column::make('Costo Estimado', 'cost')
+                ->visibleInExport(true)
+                ->hidden(),
+
+            Column::make('Costo Generado', 'cost_real_format')
+                ->sortable()
+                ->searchable()
+                ->visibleInExport(false),
+
+            Column::make('Costo Generado', 'cost_real')
                 ->visibleInExport(true)
                 ->hidden(),
         ];
@@ -113,7 +129,6 @@ final class CostActivityTable extends PowerGridComponent
             Filter::inputText('code', 'activities.code')->operators(['contains']),
             Filter::inputText('activity_name', 'activities.name')->operators(['contains']),
             Filter::inputText('unit_name', 'units.name')->operators(['contains']),
-            Filter::inputText('cost')->operators(['contains']),
         ];
     }
 }

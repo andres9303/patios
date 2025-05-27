@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Table\Master;
 
+use App\Models\Master\Company;
 use App\Models\Master\Location;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -38,8 +39,11 @@ final class LocationTable extends PowerGridComponent
 
     public function datasource(): Builder
     {
+        $company_all = Company::where('name', 'Todos')->first();
+
         return Location::query()
             ->leftJoin('locations as parent', 'parent.id', '=', 'locations.ref_id')
+            ->whereIn('locations.company_id', [auth()->user()->current_company_id, $company_all->id])
             ->select([
                 'locations.*',
                 'parent.name as parent_name',

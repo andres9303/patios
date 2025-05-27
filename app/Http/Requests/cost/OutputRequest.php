@@ -20,4 +20,14 @@ class OutputRequest extends FormRequest
             'person_id' => 'required|exists:people,id',
         ];
     }
+
+    public function messages()
+    {
+        return [
+            'code.required' => 'El código es obligatorio.',
+            'num.required' => 'El número es obligatorio.',
+            'date.required' => 'La fecha es obligatoria.',
+            'person_id.required' => 'La persona es obligatoria.',
+        ];
+    }
 }

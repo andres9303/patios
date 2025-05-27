@@ -16,7 +16,7 @@
                     <h3 class="font-semibold text-lg">Ticket #{{ $ticket->id }}</h3>
                     <p class="text-sm text-gray-500">{{ $ticket->date }}</p>
                     <p class="text-sm"><spam class="font-semibold">Huésped:</spam> {{ $ticket->name }}</p>
-                    <p class="text-sm"><spam class="font-semibold">Categoría:</spam> {{ $ticket->category2->text }}</p>
+                    <p class="text-sm"><spam class="font-semibold">Categoría:</spam> {{ $ticket->category2 ? $ticket->category2->text : '-' }}</p>
                     @if ($ticket->updated_at > $ticket->created_at)
                     <p class="text-xs"><spam class="font-semibold italic text-indigo-800">[EDITADO]</spam></p>  
                     @endif

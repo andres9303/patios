@@ -60,6 +60,12 @@
             ->placeholder('Es Proveedor?') !!}
     </div>
     <div class="mt-4">
+        {!! html()->label('Es Operador?')->for('isOperator') !!}
+        {!! html()->checkbox('isOperator', $person->isOperator ?? null)
+            ->class('block mt-1 w-full' . ($errors->has('isOperator') ? ' is-invalid' : ''))
+            ->placeholder('Es Operador?') !!}
+    </div>
+    <div class="mt-4">
         {!! html()->label('Es Empleado?')->for('isEmployee') !!}
         {!! html()->checkbox('isEmployee', $person->isEmployee ?? null)
             ->class('block mt-1 w-full' . ($errors->has('isEmployee') ? ' is-invalid' : ''))
@@ -71,4 +77,5 @@
             ->class('block mt-1 w-full' . ($errors->has('state') ? ' is-invalid' : ''))
             ->placeholder('Estado') !!}
     </div>
+    @livewire('component.company-selector', ['selected' => old('companies', isset($person) ? $person->companies->pluck('id')->toArray() : [])])
 </div>

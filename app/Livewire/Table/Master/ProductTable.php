@@ -2,7 +2,10 @@
 
 namespace App\Livewire\Table\Master;
 
+use App\Models\Config\Item;
+use App\Models\Master\Company;
 use App\Models\Master\Product;
+use App\Models\Master\Unit;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\View\View;
@@ -17,7 +20,8 @@ use PowerComponents\LivewirePowerGrid\Traits\WithExport;
 final class ProductTable extends PowerGridComponent
 {
     use WithExport;
-
+    private int $category_id = 203;
+    private int $type_id = 20701;
     public string $tableName = 'lpg-product-table';
 
     public function setUp(): array
@@ -41,10 +45,12 @@ final class ProductTable extends PowerGridComponent
         return Product::query()
             ->leftJoin('units', 'units.id', '=', 'products.unit_id')
             ->leftJoin('items', 'items.id', '=', 'products.item_id')
+            ->leftJoin('items as areas', 'areas.id', '=', 'products.type')
             ->select([
                 'products.*',
                 'units.name as unit_name',
                 'items.name as item_name',
+                'areas.name as area_name',
             ])
             ->orderBy('items.name')
             ->orderBy('products.name');
@@ -63,6 +69,7 @@ final class ProductTable extends PowerGridComponent
             ->add('unit_name')
             ->add('state')
             ->add('isinventory')
+            ->add('area_name')
             ->add('item_name');
     }
 
@@ -73,7 +80,7 @@ final class ProductTable extends PowerGridComponent
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Categoría', 'item_name', 'items.name')
+            Column::make('Categoría', 'item_name', 'items.id')
                 ->sortable()
                 ->searchable(),
 
@@ -81,7 +88,7 @@ final class ProductTable extends PowerGridComponent
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Unidad', 'unit_name', 'units.name')
+            Column::make('Unidad', 'unit_name', 'units.id')
                 ->sortable()
                 ->searchable(),
 
@@ -95,6 +102,10 @@ final class ProductTable extends PowerGridComponent
                 ->sortable()
                 ->searchable(),
 
+            Column::make('Área', 'area_name', 'areas.id')
+                ->sortable()
+                ->searchable(),
+
             Column::action('')
         ];
     }
@@ -104,10 +115,11 @@ final class ProductTable extends PowerGridComponent
         return [
             Filter::inputText('code', 'products.code')->operators(['contains']),
             Filter::inputText('name', 'products.name')->operators(['contains']),
-            Filter::inputText('unit_name', 'units.name')->operators(['contains']),
+            Filter::select('unit_name', 'units.id')->dataSource(Unit::where('state', 1)->orderBy('name')->get())->optionLabel('name')->optionValue('id'),
             Filter::inputText('state', 'products.state')->operators(['contains']),
             Filter::inputText('isinventory', 'products.isinventory')->operators(['contains']),
-            Filter::inputText('item_name', 'items.name')->operators(['contains']),
+            Filter::select('item_name', 'items.id')->dataSource(Item::where('catalog_id', $this->category_id)->orderBy('name')->get())->optionLabel('name')->optionValue('id'),
+            Filter::select('area_name', 'areas.id')->dataSource(Item::where('catalog_id', $this->type_id)->orderBy('name')->get())->optionLabel('name')->optionValue('id'),
         ];
     }
 

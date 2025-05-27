@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\master;
+namespace App\Http\Requests\Master;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -22,6 +22,8 @@ class UnitRequest extends FormRequest
             'state' => 'nullable|integer',
             'unit_id' => 'nullable|exists:units,id',
             'factor' => 'nullable|numeric',
+            'companies' => 'nullable|array',
+            'companies.*' => 'exists:companies,id',
         ];
     }
 }

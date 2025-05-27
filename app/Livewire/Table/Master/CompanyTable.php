@@ -5,6 +5,7 @@ namespace App\Livewire\Table\Master;
 use App\Models\Master\Company;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use PowerComponents\LivewirePowerGrid\Button;
 use PowerComponents\LivewirePowerGrid\Column;
@@ -153,13 +154,13 @@ final class CompanyTable extends PowerGridComponent
                 'active' => true
             ],
             [
-                'name' => 'Eliminar',
+                'name' => 'Inactivar',
                 'route' => 'company.destroy',
                 'params' => ['company' => $row->id],
                 'color' => 'red',
                 'icon' => 'fa fa-trash-alt',
                 'type' => 'delete',
-                'active' => true
+                'active' => $row->id !== Auth::user()->current_company_id
             ],
         ];
 

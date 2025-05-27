@@ -3,8 +3,10 @@
 namespace App\Livewire\Table\Cost;
 
 use App\Models\Doc;
+use App\Models\Master\Person;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Components\SetUp\Exportable;
@@ -16,6 +18,7 @@ use PowerComponents\LivewirePowerGrid\Traits\WithExport;
 
 final class OutputTable extends PowerGridComponent
 {
+    private int $menu_id = 503; 
     use WithExport;
 
     public string $tableName = 'lpg-output-table';
@@ -39,8 +42,8 @@ final class OutputTable extends PowerGridComponent
     public function datasource(): Builder
     {
         return Doc::query()
-            ->where('menu_id', 503) // Filtro por menu_id = 503
-            ->where('company_id', auth()->user()->current_company_id)
+            ->where('menu_id', $this->menu_id) 
+            ->where('company_id', Auth::user()->current_company_id)
             ->leftJoin('people', 'people.id', '=', 'docs.person_id')
             ->select([
                 'docs.*',
@@ -63,10 +66,6 @@ final class OutputTable extends PowerGridComponent
             ->add('num')
             ->add('date')
             ->add('person_name')
-            ->add('subtotal')
-            ->add('subtotal_format', fn ($row) => number_format($row->subtotal))
-            ->add('iva')
-            ->add('iva_format', fn ($row) => number_format($row->iva))
             ->add('total')
             ->add('total_format', fn ($row) => number_format($row->total))
             ->add('state');
@@ -87,27 +86,9 @@ final class OutputTable extends PowerGridComponent
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Persona', 'person_name', 'people.name')
+            Column::make('Responsable', 'person_name', 'people.id')
                 ->sortable()
                 ->searchable(),
-
-            Column::make('Subtotal', 'subtotal_format', 'docs.subtotal')
-                ->sortable()
-                ->searchable()
-                ->visibleInExport(false),
-
-            Column::make('Subtotal', 'subtotal', 'docs.subtotal')
-                ->visibleInExport(true)
-                ->hidden(),
-
-            Column::make('IVA', 'iva_format', 'docs.iva')
-                ->sortable()
-                ->searchable()
-                ->visibleInExport(false),
-
-            Column::make('IVA', 'iva_format', 'docs.iva')
-                ->visibleInExport(true)
-                ->hidden(),
 
             Column::make('Total', 'total_format', 'docs.total')
                 ->sortable()
@@ -133,7 +114,7 @@ final class OutputTable extends PowerGridComponent
             Filter::inputText('code', 'docs.code')->operators(['contains']),
             Filter::inputText('num', 'docs.num')->operators(['contains']),
             Filter::inputText('date', 'docs.date')->operators(['contains']),
-            Filter::inputText('person_name', 'people.name')->operators(['contains']),
+            Filter::select('person_name', 'people.id')->dataSource(Person::where('isEmployee', 1)->where('state', 1)->get())->optionLabel('name')->optionValue('id'),
             Filter::inputText('subtotal', 'docs.subtotal')->operators(['contains']),
             Filter::inputText('iva', 'docs.iva')->operators(['contains']),
             Filter::inputText('total', 'docs.total')->operators(['contains']),
@@ -160,6 +141,15 @@ final class OutputTable extends PowerGridComponent
                 'color' => 'red',
                 'icon' => 'fa fa-trash-alt',
                 'type' => 'delete',
+                'active' => true
+            ],
+            [
+                'name' => 'Adjuntos',
+                'route' => 'output.attachment.index',
+                'params' => ['output' => $row->id],
+                'color' => 'yellow',
+                'icon' => 'fa fa-paperclip',
+                'type' => 'button',
                 'active' => true
             ],
         ];
